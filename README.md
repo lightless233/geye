@@ -1,2 +1,2 @@
 # geye
-🚀Faster Github Monitor🚀
+Under development.
