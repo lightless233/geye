@@ -42,8 +42,21 @@ DB_PASSWORD = ""
 DB_HOST = ""
 DB_PORT = ""
 
-# 每个关键字的监控时间
+##########
+# Queue settings
+##########
+# Search任务队列大小
+SEARCH_TASK_QUEUE_SIZE = 1024
+
+##########
+# Refresh Engine
+##########
+# 每隔多久检查一次search rule是否需要爬取了
+# 默认每隔60秒检查一次每个search rule是否需要爬取了
 REFRESH_INTERVAL = 60
 
-# 每个队列的大小
-SEARCH_TASK_QUEUE_SIZE = 1024
+##########
+# Github API 相关设置
+##########
+GITHUB_API_SEARCH_URL = "https://api.github.com/search/code"
+GITHUB_SEARCH_PAGE_SIZE = 5

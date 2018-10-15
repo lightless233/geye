@@ -44,17 +44,19 @@ class RefreshEngine(SingleThreadEngine):
                 if row.last_refresh_time + datetime.timedelta(minutes=delay) < current_time:
                     # 该刷新了，添加到任务队列中去
                     # 添加一个字典，如果后续改成分布式，需要改成JSON字符串
+                    # Task格式：
+                    #   tuple(priority, _task)
 
                     # build task
-                    _task = {
+                    _data = {
                         "search_rule_id": row.id,
                         "search_rule_name": row.name,
                         "search_rule_content": row.rule,
                     }
-
+                    task = (row.priority, _data)
                     while True:
                         try:
-                            refresh_task_queue.put(_task)
+                            refresh_task_queue.put_nowait(task)
                             break
                         except queue.Full:
                             self.ev.wait(3)

@@ -28,12 +28,16 @@ class GeyeSearchRuleModel(GeyeBaseModel):
         搜索关键字
     status
         状态，1-启用，0-关闭
+    priority:
+        优先级，默认为5,1-10，越大越优先被搜索
     last_refresh_time
         上次刷新时间
     delay
         刷新间隔，单位分钟
     need_notification
         当该条SRID命中后是否需要发送通知，默认
+    clone:
+        当命中规则后，是否需要clone保存代码
     """
 
     class Meta:
@@ -42,6 +46,7 @@ class GeyeSearchRuleModel(GeyeBaseModel):
     name = models.CharField(max_length=128, default="", null=False)
     rule = models.CharField(max_length=1024, default="", null=False)
     status = models.PositiveSmallIntegerField(default=1)
+    priority = models.PositiveIntegerField(default=5, null=False)
     last_refresh_time = models.DateTimeField(auto_now_add=True)
     delay = models.PositiveIntegerField(default=5)
     need_notification = models.BooleanField(default=False)

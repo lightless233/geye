@@ -16,14 +16,17 @@ import queue
 
 
 class GeyeApplication(object):
-
     class Engines:
         """存储所有的Engines"""
         REFRESH_ENGINE = None
 
     class MessageQueues:
         """存储所有的消息队列"""
+        # 存储搜索任务的队列
         SEARCH_TASK_QUEUE: queue.PriorityQueue = None
+
+        # 存储过滤任务的队列
+        FILTER_TASK_QUEUE: queue.PriorityQueue = None
 
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
