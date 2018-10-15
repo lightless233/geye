@@ -41,3 +41,9 @@ DB_USER = ""
 DB_PASSWORD = ""
 DB_HOST = ""
 DB_PORT = ""
+
+# 每个关键字的监控时间
+REFRESH_INTERVAL = 60
+
+# 每个队列的大小
+SEARCH_TASK_QUEUE_SIZE = 1024

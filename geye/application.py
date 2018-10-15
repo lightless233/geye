@@ -23,7 +23,7 @@ class GeyeApplication(object):
 
     class MessageQueues:
         """存储所有的消息队列"""
-        SEARCH_TASK_QUEUE = None
+        SEARCH_TASK_QUEUE: queue.PriorityQueue = None
 
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()

@@ -13,6 +13,8 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 import datetime
+import queue
+import time
 
 from django.conf import settings
 
@@ -30,6 +32,8 @@ class RefreshEngine(SingleThreadEngine):
 
         logger.info("RefreshEngine start!")
 
+        refresh_task_queue = self.app_ctx.MessageQueues.SEARCH_TASK_QUEUE
+
         while self.status == self.EngineStatus.RUNNING:
             logger.debug("start build search task.")
             rows = GeyeSearchRuleModel.objects.filter(is_deleted=0, status=1).all()
@@ -40,8 +44,21 @@ class RefreshEngine(SingleThreadEngine):
                 if row.last_refresh_time + datetime.timedelta(minutes=delay) < current_time:
                     # 该刷新了，添加到任务队列中去
                     # 添加一个字典，如果后续改成分布式，需要改成JSON字符串
+
+                    # build task
+                    _task = {
+                        "search_rule_id": row.id,
+                        "search_rule_name": row.name,
+                        "search_rule_content": row.rule,
+                    }
+
                     while True:
-                        pass
+                        try:
+                            refresh_task_queue.put(_task)
+                            break
+                        except queue.Full:
+                            self.ev.wait(3)
+                            continue
 
                     # 更新任务的最后刷新时间
                     row.last_refresh_time = current_time
