@@ -6,6 +6,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     使用search rule在github上进行第一次初步搜索
+    todo: 改成协程
 
     :author:    lightless <root@lightless.me>
     :homepage:  None
