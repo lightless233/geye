@@ -56,7 +56,24 @@ SEARCH_TASK_QUEUE_SIZE = 1024
 REFRESH_INTERVAL = 60
 
 ##########
+# Search Engine
+##########
+# 设置在爬取的时候是否使用代理
+# 如果需要代理，就在下面配置，配置多个代理的情况下
+# 每次会随机获取一个代理使用
+USE_SEARCH_PROXY = True
+SEARCH_PROXIES = [
+    {
+        "http": "socks5://user:pass@host:port",
+        "https": "socks5://user:pass@host:port"
+    }
+]
+
+##########
 # Github API 相关设置
 ##########
 GITHUB_API_SEARCH_URL = "https://api.github.com/search/code"
-GITHUB_SEARCH_PAGE_SIZE = 5
+# 搜索多少页
+SEARCH_PAGE_SIZE = 5
+# 每页的数量
+EACH_PAGE_ITEM_SIZE = 100
