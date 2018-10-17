@@ -19,6 +19,26 @@ from django.db import models
 from ..base import GeyeBaseModel
 
 
+class FilterRuleManager(models.Manager):
+    def get_filter_rules_by_srid(self, srid, contains_global_rule=True):
+        """
+        返回指定SRID对应的全部filter规则
+        :param srid:
+        :param contains_global_rule: True-包含全局规则，False-不包含全局规则
+        :return: list
+        """
+        all_rules = []
+        if contains_global_rule:
+            global_rules = self.filter(is_deleted=0, parent_id=0, status=1).order_by('-priority').all()
+            for r in global_rules:
+                all_rules.append(r)
+
+        child_rules = self.filter(is_deleted=0, parent_id=srid, status=1).order_by('-priority').all()
+        for r in child_rules:
+            all_rules.append(r)
+        return all_rules
+
+
 class GeyeFilterRuleModel(GeyeBaseModel):
     """
     用于获取详细代码后二次匹配用到的filter规则
@@ -60,9 +80,19 @@ class GeyeFilterRuleModel(GeyeBaseModel):
 
     name = models.CharField(max_length=128)
     rule_type = models.PositiveSmallIntegerField(default=0)
+    rule_engine = models.PositiveSmallIntegerField(default=0)
     rule = models.TextField()
     status = models.PositiveSmallIntegerField(default=1)
     parent_id = models.BigIntegerField(default=0)
     action = models.PositiveSmallIntegerField(default=1)
     position = models.PositiveSmallIntegerField(default=1)
     priority = models.PositiveIntegerField(default=5)
+
+    objects = models.Manager()
+    instance = FilterRuleManager()
+
+    def __str__(self):
+        return "<GeyeFilterRuleModel id:{} name:{} parent_id: {}>".format(self.id, self.name, self.parent_id)
+
+    def __repr__(self):
+        return "<GeyeFilterRuleModel id:{} name:{} parent_id: {}>".format(self.id, self.name, self.parent_id)

@@ -29,7 +29,7 @@ from geye.utils.log import logger
 
 
 class SearchEngine(MultiThreadEngine):
-    def __init__(self, app_ctx, name=None, pool_size=None):
+    def __init__(self, app_ctx, name, pool_size=None):
         super(SearchEngine, self).__init__(app_ctx, name, pool_size)
 
         # 获取配置信息

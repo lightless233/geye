@@ -28,6 +28,9 @@ class GeyeApplication(object):
         # 存储过滤任务的队列
         FILTER_TASK_QUEUE: queue.PriorityQueue = None
 
+        # 存储所有的持久化任务
+        SAVE_TASK_QUEUE: queue.PriorityQueue = None
+
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
         self.run_mode = run_mode
