@@ -19,6 +19,9 @@ class GeyeApplication(object):
     class Engines:
         """存储所有的Engines"""
         REFRESH_ENGINE = None
+        SEARCH_ENGINE = None
+        FILTER_ENGINE = None
+        SAVE_ENGINE = None
 
     class MessageQueues:
         """存储所有的消息队列"""

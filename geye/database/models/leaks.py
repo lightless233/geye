@@ -23,6 +23,19 @@ class LeaksStatusConstant:
     IGNORE = 3
 
 
+class LeaksManager(models.Manager):
+    def is_exist(self, sha):
+        """
+        根据哈希判断某条记录是否存在
+        :param sha:
+        :return:
+        """
+        if self.filter(is_deleted=0, sha=sha).first():
+            return True
+        else:
+            return False
+
+
 class GeyeLeaksModel(GeyeBaseModel):
     """
 
@@ -67,3 +80,6 @@ class GeyeLeaksModel(GeyeBaseModel):
     frid = models.BigIntegerField(default=0)
     status = models.PositiveSmallIntegerField(default=1)
     pushed = models.BooleanField(default=False)
+
+    object = models.Manager()
+    instance = LeaksManager()
