@@ -26,27 +26,18 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 import queue
-from typing import List
-
-import random
 import threading
+from typing import List
+import random
 
 import requests
 from django.conf import settings
 
+from geye.core.engine.base import MultiThreadEngine
 from geye.database.models import GeyeFilterRuleModel
+from geye.database.models import LeaksStatusConstant
 from geye.utils.log import logger
-from .base import MultiThreadEngine
-
-
-class RuleEngine(object):
-    @staticmethod
-    def regex_filter() -> tuple:
-        pass
-
-    @staticmethod
-    def string_filter(rule_content, filter_content) -> tuple:
-        pass
+from .rule import RuleEngine
 
 
 class FilterEngine(MultiThreadEngine):
@@ -157,25 +148,43 @@ class FilterEngine(MultiThreadEngine):
         # 3. 根据rule的action进行后续处理
 
         :param rule: 规则model
-        :param task: task字典
+        :param task: 队列中获取到的task对象
         :param raw_code: 完整的代码
         :return:
         """
+        # 返回的对象
+        rv = {
+            "error": False,
+            "found": False,
+            "code": ""
+        }
+
+        # 获取待匹配的内容
         result = self.__get_content_by_position(rule.position, task, raw_code)
         if not result["success"]:
             # 获取内容失败了，直接返回，不匹配了
             return False
+        content = result["filter_content"]
 
         if rule.rule_engine == 1:
             # 正则匹配，使用设置里指定的正则引擎，支持grep引擎和raw引擎
             # grep引擎：调用系统的grep命令
             # raw引擎：使用Python自带的正则引擎
-            pass
+            filter_result = RuleEngine.regex_filter(rule.rule, content, rule.id)
+            rv["error"] = filter_result["error"]
+            rv["found"] = filter_result["found"]
+            rv["code"] = filter_result["code"]
+            return rv
         elif rule.rule_engine == 2:
             # 字符串匹配
-            pass
+            filter_result = RuleEngine.string_filter(rule.rule, content)
+            rv["error"] = filter_result["error"]
+            rv["found"] = filter_result["found"]
+            rv["code"] = filter_result["code"]
+            return rv
         else:
-            pass
+            logger.error("unknown filter engine, rule_engine: '{}'".format(rule.rule_engine))
+            return False
 
     def _worker(self):
         current_name = threading.current_thread().name
@@ -213,9 +222,76 @@ class FilterEngine(MultiThreadEngine):
                 logger.debug("==== filter rule: {}, content: {}".format(_rule, _rule.rule))
                 result = self.do_filter(_rule, task, raw_code)
 
-            logger.debug("#### [end] SEARCH RULE: {}".format(task["search_rule_name"]))
+                # 匹配过程中有错误，直接终止匹配
+                if not result or result["error"]:
+                    break
 
-            # 放到存储队列中去
-            pass
+                # 根据规则的正向/反向，获取是否命中
+                # hit变量表示是否命中规则
+                if _rule.rule_type == 1:
+                    # 正向匹配，匹配到算命中
+                    hit = True if result["found"] else False
+                elif _rule.rule_type == 2:
+                    # 反向匹配，没有匹配到算命中
+                    hit = True if not result["found"] else False
+                else:
+                    logger.error("Error rule_type: {}".format(_rule.rule_type))
+                    break
+                logger.debug("filter end. hit result: %s", hit)
+
+                # 根据匹配结果，决定是向下匹配还是存起来
+                if hit:
+                    _action = _rule.action
+                    # 1-啥也不做，继续下一条匹配，不保存，可以用于其他规则的前置
+                    # 2-设为误报，结束匹配，不保存，可以排除掉一定不是敏感信息泄露的内容
+                    # 3-设为误报，结束匹配，保存，可以排除掉一定不是敏感信息泄露的内容
+                    # 4-设为确认，结束匹配，保存，确定规则
+                    # 5-设为待确认，结束匹配，保存
+                    if _action == 1:
+                        logger.debug("Action: None -> continue next.")
+                        continue
+                    elif _action == 2:
+                        logger.debug("Action: Ignore -> no save -> end filter.")
+                        break
+                    elif _action == 3:
+                        logger.debug("Action: Ignore -> save -> end filter.")
+                        save_task = (task_priority, {
+                            "code": result["code"],
+                            "status": LeaksStatusConstant.IGNORE,
+                            "pushed": 0,
+                            "frid": _rule.id,
+                            "filter_task": task,
+                            "filter_rule_name": _rule.name
+                        })
+                        self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                    elif _action == 4:
+                        logger.debug("Action: Confirm -> save -> end filter.")
+                        save_task = (task_priority, {
+                            "code": result["code"],
+                            "status": LeaksStatusConstant.CONFIRM,
+                            "pushed": 0,
+                            "frid": _rule.id,
+                            "filter_task": task,
+                            "filter_rule_name": _rule.name
+                        })
+                        self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                    elif _action == 5:
+                        logger.debug("Action: To-be-confirmed -> save -> end filter.")
+                        save_task = (task_priority, {
+                            "code": result["code"],
+                            "status": LeaksStatusConstant.TO_BE_CONFIRMED,
+                            "pushed": 0,
+                            "frid": _rule.id,
+                            "filter_task": task,
+                            "filter_rule_name": _rule.name
+                        })
+                        self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                    else:
+                        logger.error("Unknown action value: {}".format(_action))
+                else:
+                    logger.debug("no hit, continue filter next rule.")
+                    continue
+
+            logger.debug("#### [end] SEARCH RULE: {}".format(task["search_rule_name"]))
 
         logger.info("{} end!".format(current_name))

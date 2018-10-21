@@ -17,6 +17,12 @@ from django.db import models
 from geye.database.models.base import GeyeBaseModel
 
 
+class LeaksStatusConstant:
+    TO_BE_CONFIRMED = 1
+    CONFIRM = 2
+    IGNORE = 3
+
+
 class GeyeLeaksModel(GeyeBaseModel):
     """
 

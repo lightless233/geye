@@ -68,6 +68,10 @@ SEARCH_PROXIES = [
         "https": "socks5://user:pass@host:port"
     }
 ]
+# 正则引擎的设置，目前支持的为：
+# "inner" - python原生正则引擎，效率较低
+# "grep" - linux中的grep命令，效率高，但是windows系统要提前安装才可使用
+REGEX_ENGINE = "inner"
 
 ##########
 # Github API 相关设置
