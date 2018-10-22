@@ -6,6 +6,7 @@
     ~~~~~~~~~~~~~~~~~~~~~
 
     将任务存储的PostgreSQL中
+    如果太慢了，考虑改成线程池
 
     :author:    lightless <root@lightless.me>
     :homepage:  None
