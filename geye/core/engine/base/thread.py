@@ -12,6 +12,9 @@
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+
+# from __future__ import annotations
+
 import multiprocessing
 import threading
 import typing
@@ -29,10 +32,10 @@ class SingleThreadEngine(CommonBaseEngine):
     基于单线程的引擎模块
     """
 
-    def __init__(self, app_ctx: GeyeApplication, name=None):
+    def __init__(self, app_ctx: "GeyeApplication", name=None):
         super(SingleThreadEngine, self).__init__()
         self.name = name if name else "SingleThreadEngine"
-        self.app_ctx: GeyeApplication = app_ctx
+        self.app_ctx: "GeyeApplication" = app_ctx
 
     def start(self):
         self.thread: threading.Thread = threading.Thread(target=self._worker, name=self.name)
@@ -56,10 +59,10 @@ class MultiThreadEngine(CommonBaseEngine):
     基于多线程的基础引擎
     """
 
-    def __init__(self, app_ctx: GeyeApplication, name=None, pool_size=None):
+    def __init__(self, app_ctx: "GeyeApplication", name=None, pool_size=None):
         super(MultiThreadEngine, self).__init__()
         self.name = name if name else "MultiThreadEngine"
-        self.app_ctx: GeyeApplication = app_ctx
+        self.app_ctx: "GeyeApplication" = app_ctx
         self.pool_size = pool_size if pool_size else multiprocessing.cpu_count() * 2 + 1
 
     def start(self):

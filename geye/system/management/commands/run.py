@@ -21,19 +21,20 @@ from geye.core import data as gdata
 class Command(BaseCommand):
 
     help = "Start the GEYE application."
-    available_opts = ["server_mode", "agent_mode"]
+    available_opts = ["server", "agent", "single"]
 
     def add_arguments(self, parser):
-        parser.add_argument("--server", action="store_true", dest="server_mode", help="Run GEYE as server.")
-        parser.add_argument("--agent", action="store_true", dest="agent_mode", help="Run GEYE as agent.")
+        parser.add_argument("--single", action="store_const", const="single", dest="run_mode", help="Run GEYE as single app. (Default)")
+        parser.add_argument("--server", action="store_const", const="server", dest="run_mode", help="Run GEYE as server.")
+        parser.add_argument("--agent", action="store_const", const="agent", dest="run_mode", help="Run GEYE as agent.")
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.INFO("Starting GEYE application."))
+        self.stdout.write(self.style.SUCCESS("Starting GEYE application."))
 
-        if not any([options.get(opt) for opt in self.available_opts]):
-            raise CommandError("Must specify mode.")
-
-        run_mode = "server" if options.get("server_mode") else "agent"
+        # check run_mode params
+        run_mode = options.get("run_mode")
+        if run_mode not in self.available_opts:
+            raise CommandError("错误的启动参数，只能为: '--single', '--server', '--agent' 其中之一.")
 
         try:
             gdata.application = GeyeApplication(run_mode)

@@ -74,7 +74,7 @@ class SearchEngine(MultiThreadEngine):
                 continue
 
     @staticmethod
-    def build_request_header() -> Optional[dict, None]:
+    def build_request_header() -> Optional[dict]:
         """
         OAuth2 Token (sent in a header)
             curl -H "Authorization: token OAUTH-TOKEN" https://api.github.com
