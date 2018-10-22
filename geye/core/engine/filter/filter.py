@@ -59,10 +59,13 @@ class FilterEngine(MultiThreadEngine):
         while self.status == self.EngineStatus.RUNNING:
             try:
                 task = self.filter_task_queue.get_nowait()
-                return task
+                return task[0], task[1]
             except queue.Empty:
                 self.ev.wait(1)
                 continue
+        else:
+            # normal exit
+            return None, None
 
     @staticmethod
     def get_filter_rules(srid) -> list:
@@ -194,6 +197,8 @@ class FilterEngine(MultiThreadEngine):
         while self.status == self.EngineStatus.RUNNING:
             # task_priority其实就是search rule中指定的优先级
             task_priority, task = self.get_task_from_queue()
+            if not task or not task_priority:
+                continue
 
             # 预先过滤一次hash值，如果已经泄露的表中存在这样的hash，跳过后续的检查
             # 可能会有漏报

@@ -54,14 +54,15 @@ class SearchEngine(MultiThreadEngine):
         从队列中获取任务，并且解析出真正的内容
         :return: tuple (优先级, 任务数据dict)
         """
-        while True:
+        while self.status == self.EngineStatus.RUNNING:
             try:
                 task = self.search_task_queue.get_nowait()
-                break
+                return task[0], task[1]
             except queue.Empty:
                 self.ev.wait(1)
                 continue
-        return task[0], task[1]
+        else:
+            return None, None
 
     def push_to_queue(self, priority, filter_task):
         task = (priority, filter_task)
@@ -205,6 +206,9 @@ class SearchEngine(MultiThreadEngine):
         while self.status == self.EngineStatus.RUNNING:
             # 获取任务信息
             task_priority, search_task = self.get_task_from_queue()
+            if not task_priority or not search_task:
+                continue
+
             srid = search_task.get("search_rule_id")
             rule_name = search_task.get("search_rule_name")
             rule_content = search_task.get("search_rule_content")

@@ -13,11 +13,13 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 import queue
+import signal
 from typing import Union, Optional, List
 
 from django.conf import settings
 
 from geye.core.engine import RefreshEngine, SearchEngine, FilterEngine, SaveEngine
+from geye.utils.log import logger
 
 
 class GeyeApplication(object):
@@ -43,6 +45,14 @@ class GeyeApplication(object):
         super(GeyeApplication, self).__init__()
         # run_mode 有两种，分别是server 和 agent
         self.run_mode = run_mode
+
+    def __sigint_signal_handler(self, sig, frame):
+        logger.info("Receive exit signal.")
+
+        self.Engines.REFRESH_ENGINE.stop()
+        self.Engines.SEARCH_ENGINE.stop()
+        self.Engines.FILTER_ENGINE.stop()
+        self.Engines.SAVE_ENGINE.stop()
 
     def __init_queues(self, queues: Optional[List[str]]):
 
@@ -92,6 +102,10 @@ class GeyeApplication(object):
                 self.Engines.REFRESH_ENGINE.start()
 
     def start(self):
+
+        # 注册CTRL+C处理器
+        signal.signal(signal.SIGINT, self.__sigint_signal_handler)
+
         run_mode = self.run_mode
         if run_mode == "server":
             # 以server模式启动，仅启动refresh engine和save engine

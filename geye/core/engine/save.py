@@ -37,12 +37,17 @@ class SaveEngine(SingleThreadEngine):
             except queue.Empty:
                 self.ev.wait(1)
                 continue
+        else:
+            return None, None
 
     def _worker(self):
         logger.info("{} start!".format(self.name))
 
         while self.status == self.EngineStatus.RUNNING:
             task_priority, task = self.get_task_from_queue()
+            if not task_priority or not task:
+                continue
+
             filter_task = task["filter_task"]
 
             if GeyeLeaksModel.instance.is_exist(filter_task["sha"]):

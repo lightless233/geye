@@ -38,9 +38,9 @@ class SingleThreadEngine(CommonBaseEngine):
         self.app_ctx: "GeyeApplication" = app_ctx
 
     def start(self):
+        self.status = self.EngineStatus.RUNNING
         self.thread: threading.Thread = threading.Thread(target=self._worker, name=self.name)
         self.thread.start()
-        self.status = self.EngineStatus.RUNNING
 
     def stop(self, force=True):
         self.status = self.EngineStatus.STOP
@@ -66,12 +66,12 @@ class MultiThreadEngine(CommonBaseEngine):
         self.pool_size = pool_size if pool_size else multiprocessing.cpu_count() * 2 + 1
 
     def start(self):
+        self.status = self.EngineStatus.RUNNING
         self.thread_pool: typing.List[threading.Thread] = \
             [threading.Thread(
                 target=self._worker, name="{}-{}".format(self.name, idx)
             ) for idx in range(self.pool_size)]
         _ = [t.start() for t in self.thread_pool]
-        self.status = self.EngineStatus.RUNNING
 
     def stop(self, force=True):
         if not force:
