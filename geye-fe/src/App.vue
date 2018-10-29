@@ -11,7 +11,9 @@
 </template>
 
 <style>
-
+  @import "../static/css/icon.css";
+  @import "../static/css/main.css";
+  @import "../static/css/color-dark.css";
 </style>
 
 
