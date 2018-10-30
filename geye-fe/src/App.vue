@@ -11,7 +11,6 @@
 </template>
 
 <style>
-  @import "../static/css/icon.css";
   @import "../static/css/main.css";
   @import "../static/css/color-dark.css";
 </style>
@@ -20,6 +19,7 @@
 <script>
   import Header from "@/components/common/Header";
   import Sidebar from "@/components/common/Sidebar";
+  import globalData from "./components/common/data";
 
   export default {
     name: "Home",
@@ -31,6 +31,11 @@
       return {
         collapse: false,
       }
+    },
+    created() {
+      globalData.$on("collapse", msg => {
+        this.collapse = msg;
+      })
     }
   }
 </script>
