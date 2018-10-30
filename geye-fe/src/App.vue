@@ -13,8 +13,6 @@
 <style>
   @import "../static/css/main.css";
   @import "../static/css/color-dark.css";
-  @import "../node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css";
-  @import
 </style>
 
 

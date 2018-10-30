@@ -1,24 +1,28 @@
 <template>
   <div class="sidebar">
     <el-menu class="sidebar-el-menu" background-color="#324157"
-             text-color="#bfcbd9" active-text-color="#20a0ff" :collapse="collapse">
+             text-color="#bfcbd9" active-text-color="#20a0ff" :collapse="collapse"
+             @select="handleSelect">
 
       <template v-for="item in items">
         <template v-if="item.subs">
           <el-submenu :index="item.index" :key="item.index">
             <template slot="title">
-              <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+              <font-awesome-icon :icon="item.icon" fixed-width=""/>
+              <span class="menu-item">{{ item.title }}</span>
             </template>
             <template v-for="subItem in item.subs">
               <el-menu-item :index="subItem.index" :key="subItem.index">
-                <span slot="title">{{ subItem.title }}</span>
+                <font-awesome-icon :icon="['far', 'circle']" fixed-width size="xs"/>
+                <span> {{ subItem.title }}</span>
               </el-menu-item>
             </template>
           </el-submenu>
         </template>
         <template v-else>
           <el-menu-item :index="item.index" :key="item.index">
-            <i :class="item.icon"></i><span slot="title">{{ item.title }}</span>
+            <font-awesome-icon :icon="item.icon" fixed-width=""/>
+            <span class="menu-item">{{ item.title }}</span>
           </el-menu-item>
         </template>
       </template>
@@ -37,12 +41,12 @@
         collapse: false,
         items: [
           {
-            icon: "el-icon-menu",
+            icon: "tachometer-alt",
             index: "dashboard",
             title: "Dashboard",
           },
           {
-            icon: "el-icon-menu",
+            icon: "list",
             index: "rule-management",
             title: "规则管理",
             subs: [
@@ -61,7 +65,7 @@
             ]
           },
           {
-            icon: "el-icon-menu",
+            icon: "paper-plane",
             index: "handle-center",
             title: "处理中心"
           }
@@ -73,6 +77,15 @@
         console.log("receive message: " + msg);
         this.collapse = msg;
       })
+    },
+    methods: {
+      handleSelect(key, keyPath) {
+        console.log("key: " + key + " keyPath: " + keyPath);
+        if (keyPath[0] === "rule-management") {
+          console.log("hit");
+          
+        }
+      },
     }
   }
 </script>
@@ -99,4 +112,9 @@
   .sidebar > ul {
     height: 100%;
   }
+
+  .menu-item {
+    margin-left: 10px;
+  }
+
 </style>

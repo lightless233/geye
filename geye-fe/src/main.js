@@ -5,13 +5,14 @@ import NormailizeCss from 'normalize.css'
 
 // font awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faCoffee } from '@fortawesome/free-solid-svg-icons'
+import { faTachometerAlt, faList, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import {faCircle} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 import App from './App'
 import router from './router'
 
-library.add(faCoffee);
+library.add(faTachometerAlt, faList, faPaperPlane, faCircle);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
