@@ -14,7 +14,7 @@ const routerConf = [
   },
   {
     path: "/rule/search-rule-management",
-    component: resolve => require(["../components/rule-management/search-rule-management.vue"], resolve),
+    component: resolve => require(["../components/rule/search-rule-management.vue"], resolve),
   },
   {
     path: "/*",
