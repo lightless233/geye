@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" id="app">
     <v-head></v-head>
     <v-sidebar></v-sidebar>
     <div class="content-box" :class="{'content-collapse': collapse}">

@@ -8,11 +8,13 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faTachometerAlt, faList, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import {faCircle} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+library.add(faTachometerAlt, faList, faPaperPlane, faCircle);
+
 
 import App from './App'
 import router from './router'
 
-library.add(faTachometerAlt, faList, faPaperPlane, faCircle);
+
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 Vue.use(ElementUI);

@@ -2,7 +2,7 @@
   <div class="sidebar">
     <el-menu class="sidebar-el-menu" background-color="#324157"
              text-color="#bfcbd9" active-text-color="#20a0ff" :collapse="collapse"
-             @select="handleSelect">
+             @select="handleSelect" :default-active="onRoutes" router>
 
       <template v-for="item in items">
         <template v-if="item.subs">
@@ -42,31 +42,31 @@
         items: [
           {
             icon: "tachometer-alt",
-            index: "dashboard",
+            index: "/dashboard",
             title: "Dashboard",
           },
           {
             icon: "list",
-            index: "rule-management",
+            index: "rule",
             title: "规则管理",
             subs: [
               {
-                index: "global-filter-rule-management",
+                index: "/rule/global-filter-rule-management",
                 title: "全局过滤规则管理",
               },
               {
-                index: "search-rule-management",
+                index: "/rule/search-rule-management",
                 title: "搜索规则管理",
               },
               {
-                index: "monitor-management",
+                index: "/rule/monitor-management",
                 title: "重点监控管理",
               }
             ]
           },
           {
             icon: "paper-plane",
-            index: "handle-center",
+            index: "/handle-center",
             title: "处理中心"
           }
         ]
@@ -86,6 +86,13 @@
           
         }
       },
+    },
+    computed: {
+      onRoutes() {
+        console.log("onRoutes: " + this.$route.path);
+        return this.$route.path;
+        // return this.$route.path.replace("/", "");
+      }
     }
   }
 </script>
