@@ -17,6 +17,14 @@ from django.db import models
 from ..base import GeyeBaseModel
 
 
+class SearchRuleManager(models.Manager):
+    def get_all_search_rules(self):
+        """
+        获取所有的search rule
+        """
+        return self.filter(is_deleted=0).all()
+
+
 class GeyeSearchRuleModel(GeyeBaseModel):
     """
     用于搜索代码的搜索规则
@@ -51,3 +59,6 @@ class GeyeSearchRuleModel(GeyeBaseModel):
     delay = models.PositiveIntegerField(default=5)
     need_notification = models.BooleanField(default=False)
     clone = models.BooleanField(default=False)
+
+    object = models.Manager()
+    instance = SearchRuleManager()
