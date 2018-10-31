@@ -5,10 +5,10 @@ import NormailizeCss from 'normalize.css'
 
 // font awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTachometerAlt, faList, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faTachometerAlt, faList, faPaperPlane, faBars } from '@fortawesome/free-solid-svg-icons'
 import {faCircle} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faTachometerAlt, faList, faPaperPlane, faCircle);
+library.add(faTachometerAlt, faList, faPaperPlane, faCircle, faBars);
 
 
 import App from './App'

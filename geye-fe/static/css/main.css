@@ -13,7 +13,7 @@ body,
 }
 
 body {
-    font-family: 'PingFang SC', "Helvetica Neue", Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 }
 
 a {
@@ -27,7 +27,7 @@ a {
     right: 0;
     top: 70px;
     bottom: 0;
-    padding-bottom: 30px;
+    padding-bottom: 10px;
     -webkit-transition: left .3s ease-in-out;
     transition: left .3s ease-in-out;
     background: #f0f0f0;
@@ -38,6 +38,7 @@ a {
     height: 100%;
     padding: 10px;
     box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .content-collapse {
