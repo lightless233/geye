@@ -11,6 +11,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faTachometerAlt, faList, faPaperPlane, faCircle, faBars);
 
 
+// axios
+import axios from "axios"
+import VueAxios from "vue-axios"
+
 import App from './App'
 import router from './router'
 
@@ -18,11 +22,9 @@ import router from './router'
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
+Vue.use(VueAxios, axios);
 
-/* eslint-disable no-new */
 new Vue({
-  el: '#app',
   router,
-  components: { App },
-  template: '<App/>'
-});
+  render: h => h(App)
+}).$mount("#app");

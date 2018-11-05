@@ -83,7 +83,7 @@
         console.log("key: " + key + " keyPath: " + keyPath);
         if (keyPath[0] === "rule-management") {
           console.log("hit");
-          
+
         }
       },
     },

@@ -18,12 +18,10 @@ from django.urls import path, include
 from .controller.rule import search
 
 
-# search rule下的路由
-search_rule_urlpatterns = [
-    path("v1/all/", search.ListSearchRuleView),
-]
+# 总的路由
+# http://example.com/api/v1/rule/search/v1/all
 
 # api下的总路由
 urlpatterns = [
-    path("rule/search/", include(search_rule_urlpatterns)),
+    path("v1/rule/search/all/", search.ListSearchRuleView)
 ]
