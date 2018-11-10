@@ -40,6 +40,7 @@ class CORSMiddleware:
             if o.hostname in self.allowed_origins:
                 response["Access-Control-Allow-Origin"] = origin
                 response["Access-Control-Allow-Headers"] = "Content-Type"
+                response["Access-Control-Allow-Credentials"] = "true"
                 return response
             else:
                 return HttpResponseForbidden("<h1>Invalid Origin</h1>")

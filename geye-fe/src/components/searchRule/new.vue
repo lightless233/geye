@@ -91,7 +91,13 @@
 
   export default {
     name: "new-search-rule",
-    mounted: function () {},
+    mounted: function () {
+      // todo: move this to global mounted function
+      this.axios.get("http://192.168.62.129:8080/api/_csrf_token", {withCredentials: true})
+        .then(function (response) {
+          document.cookie = "x-csrf-token=" + response.data + "; path=/";
+        })
+    },
     data() {
       return {
         form: {

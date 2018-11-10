@@ -16,6 +16,7 @@
 from django.urls import path, include
 
 from .controller.rule import search
+from .controller.system import csrf
 
 
 # 总的路由
@@ -23,6 +24,9 @@ from .controller.rule import search
 
 # api下的总路由
 urlpatterns = [
+
+    path("_csrf_token", csrf.CSRFTokenView.as_view()),
+
     path("v1/rule/search/all", search.ListSearchRuleView.as_view()),
     path("v1/rule/search/new", search.AddSearchRuleView.as_view()),
 ]
