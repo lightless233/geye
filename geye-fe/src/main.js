@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import NormailizeCss from 'normalize.css'
+// import NormailizeCss from 'normalize.css'
 
 // font awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -24,6 +24,7 @@ Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(VueAxios, axios);
 
+ /* eslint-disable */
 new Vue({
   router,
   render: h => h(App)

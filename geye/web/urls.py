@@ -23,5 +23,6 @@ from .controller.rule import search
 
 # api下的总路由
 urlpatterns = [
-    path("v1/rule/search/all/", search.ListSearchRuleView)
+    path("v1/rule/search/all", search.ListSearchRuleView.as_view()),
+    path("v1/rule/search/new", search.AddSearchRuleView.as_view()),
 ]

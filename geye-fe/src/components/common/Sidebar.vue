@@ -55,7 +55,7 @@
                 title: "全局过滤规则管理",
               },
               {
-                index: "/rule/search-rule-management",
+                index: "/rule/search/all",
                 title: "搜索规则管理",
               },
               {

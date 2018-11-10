@@ -15,6 +15,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.2",
     "axios": "^0.18.0",
     "element-ui": "^2.4.8",
+    "eslint": "^5.9.0",
     "normalize.css": "^8.0.0",
     "vue": "^2.5.17",
     "vue-axios": "^2.1.4",

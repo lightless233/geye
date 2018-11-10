@@ -24,6 +24,14 @@ class SearchRuleManager(models.Manager):
         """
         return self.filter(is_deleted=0).all()
 
+    def is_exist(self, rule_name):
+        """
+        判断rule name对应的规则是否存在
+        :param rule_name:
+        :return:
+        """
+        return True if self.filter(is_deleted=0, name=rule_name).first() else False
+
 
 class GeyeSearchRuleModel(GeyeBaseModel):
     """

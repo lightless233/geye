@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "geye.system.middleware.CORSMiddleware",
 ]
 
 ROOT_URLCONF = 'geye.urls'

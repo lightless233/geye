@@ -9,12 +9,15 @@
       </el-breadcrumb>
     </div>
     <div class="container">
+      <div align="right">
+        <el-button type="primary" @click="newSearchRuleButton">新建规则</el-button>
+      </div>
       <el-table
-        :data="tableData5"
-        style="width: 100%">
+          :data="searchRules"
+          style="width: 100%">
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-form label-position="left" inline class="demo-table-expand">
+            <el-form label-position="left" inline class="table-expand">
               <el-form-item label="商品名称">
                 <span>{{ props.row.name }}</span>
               </el-form-item>
@@ -40,16 +43,16 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="商品 ID"
-          prop="id">
+            label="#"
+            prop="id">
         </el-table-column>
         <el-table-column
-          label="商品名称"
-          prop="name">
+            label="商品名称"
+            prop="name">
         </el-table-column>
         <el-table-column
-          label="描述"
-          prop="desc">
+            label="描述"
+            prop="desc">
         </el-table-column>
       </el-table>
     </div>
@@ -58,6 +61,10 @@
 </template>
 
 <script>
+
+  // import config from "@/config";
+  import ruleServices from "@/services/searchRule";
+
   export default {
     name: "search-rule-management",
     data() {
@@ -66,24 +73,29 @@
         searchRules: null
       }
     },
-    mounted () {
-      console.log(process.env);
-      // let url = process.env.BASE_API + "/api/v1/search/rule/all";
-      // this.axios.get(url)
-      //   .then(response => (this.searchRules = response.data))
+    mounted() {
+      ruleServices.all(this)
+        .then(response => (this.searchRules = response.data))
+    },
+    methods: {
+      newSearchRuleButton: function () {
+        this.$router.push({"name": "new-search-rule"});
+      }
     }
   }
 </script>
 
 <style scoped>
-  .demo-table-expand {
+  .table-expand {
     font-size: 0;
   }
-  .demo-table-expand label {
+
+  .table-expand label {
     width: 90px;
     color: #99a9bf;
   }
-  .demo-table-expand .el-form-item {
+
+  .table-expand .el-form-item {
     margin-right: 0;
     margin-bottom: 0;
     width: 50%;

@@ -4,27 +4,32 @@ import Router from 'vue-router'
 Vue.use(Router);
 
 const routerConf = [
-    {
-        path: "/",
-        redirect: "/dashboard",
-    },
-    {
-        path: "/hello",
-        component: resolve => require(["../components/HelloWorld.vue"], resolve),
-    },
-    {
-        path: "/rule/search-rule-management",
-        component: resolve => require(["../components/rule/search-rule-management.vue"], resolve),
-    },
-    {
-        path: "/*",
-        component: resolve => require(["../components/404.vue"], resolve),
-    }
+  {
+    path: "/",
+    redirect: "/dashboard",
+  },
+  {
+    path: "/hello",
+    component: resolve => require(["../components/HelloWorld.vue"], resolve),
+  },
+  {
+    path: "/rule/search/all",
+    component: resolve => require(["../components/searchRule/all.vue"], resolve),
+  },
+  {
+    path: "/rule/search/new",
+    component: resolve => require(["../components/searchRule/new.vue"], resolve),
+    name: "new-search-rule",
+  },
+  {
+    path: "/*",
+    component: resolve => require(["../components/404.vue"], resolve),
+  }
 ];
 
 const router = new Router({
-    mode: "history",
-    routes: routerConf,
+  mode: "history",
+  routes: routerConf,
 });
 
 export default router;
