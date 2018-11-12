@@ -12,7 +12,8 @@ library.add(faTachometerAlt, faList, faPaperPlane, faCircle, faBars);
 
 
 // axios
-import axios from "axios"
+// import axios from "axios"
+import axios from "./utils/axios"
 import VueAxios from "vue-axios"
 
 import App from './App'
@@ -22,6 +23,7 @@ import router from './router'
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
+// Vue.prototype.$axios = axios;
 Vue.use(VueAxios, axios);
 
  /* eslint-disable */

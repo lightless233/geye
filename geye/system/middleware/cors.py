@@ -17,6 +17,8 @@ from urllib.parse import urlparse
 
 from django.http import HttpResponseForbidden
 
+from geye.utils.log import logger
+
 
 class CORSMiddleware:
 
@@ -31,6 +33,8 @@ class CORSMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        logger.debug("COOKIES: {}".format(request.COOKIES))
+        logger.debug("HEADERS: {}".format(request))
 
         origin = request.META.get("HTTP_ORIGIN", None)
         # print(origin)
@@ -39,7 +43,7 @@ class CORSMiddleware:
             # print(o.hostname)
             if o.hostname in self.allowed_origins:
                 response["Access-Control-Allow-Origin"] = origin
-                response["Access-Control-Allow-Headers"] = "Content-Type"
+                response["Access-Control-Allow-Headers"] = "Content-Type, X-CSRFToken"
                 response["Access-Control-Allow-Credentials"] = "true"
                 return response
             else:

@@ -18,14 +18,17 @@ from django.views import View
 from django.http import HttpResponse
 import django.middleware.csrf
 
+from geye.utils.log import logger
+
 
 class CSRFTokenView(View):
 
     @staticmethod
     def get(request):
-        print(request.COOKIES)
+        logger.debug("COOKIES: {}".format(request.COOKIES))
+        # csrf_token = "22222"
         csrf_token = django.middleware.csrf.get_token(request)
         response = HttpResponse(csrf_token)
-        # response.set_cookie(key="x-csrf-token", value=csrf_token)
+        # response.set_cookie("csrftoken", csrf_token, domain="192.168.62.129", samesite=None)
 
         return response

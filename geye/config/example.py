@@ -43,6 +43,13 @@ DB_HOST = ""
 DB_PORT = ""
 
 ##########
+# Web CSRF Token
+##########
+# CSRF_COOKIE_DOMAIN = "localhost:8080"
+# CSRF_USE_SESSIONS = True
+CSRF_COOKIE_SAMESITE = None
+
+##########
 # Queue settings
 ##########
 # Search任务队列大小
