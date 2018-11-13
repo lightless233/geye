@@ -25,7 +25,7 @@ axios.interceptors.request.use(
     // todo: 这里先简单判断，后面需要优化掉
     // console.log(config);
     if (config.url.indexOf(CSRF_API) > -1 || config.method !== "post") {
-      console.log("no need csrf!");
+      // console.log("no need csrf!");
       return config;
     }
 

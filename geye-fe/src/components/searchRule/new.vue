@@ -74,7 +74,7 @@
 
         <el-row>
           <el-col :span="24" align="right">
-            <el-button type="primary" @click="confirmBtn('form')">确认</el-button>
+            <el-button type="primary" @click="confirmBtn">确认</el-button>
             <el-button type="primary" plain @click="backBtn">返回</el-button>
           </el-col>
         </el-row>
@@ -88,16 +88,10 @@
 <script>
 
   import ruleService from "@/services/searchRule";
+  import ApiConstant from "@/utils/constant";
 
   export default {
     name: "new-search-rule",
-    mounted: function () {
-      // todo: move this to global mounted function
-      // this.axios.get("http://192.168.62.129:8080/api/_csrf_token", {withCredentials: true})
-      //   .then(function (response) {
-      //     document.cookie = "x-csrf-token=" + response.data + "; path=/";
-      //   })
-    },
     data() {
       return {
         form: {
@@ -106,7 +100,7 @@
           status: 1,
           notification: 0,
           clone: 0,
-          defaultFilter: 0,
+          defaultFilter: 1,
           delay: 30,
           priority: 5,
         },
@@ -123,14 +117,23 @@
       }
     },
     methods: {
-      confirmBtn: function (formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            ruleService.addSearchRule(this, this.form);
-          } else {
-            return false;
-          }
-        })
+      confirmBtn: function () {
+
+        let vue = this;
+
+        ruleService.addSearchRule(this, this.form)
+          .then(function (response) {
+            let data = response.data;
+            if (data.code === 1001) {
+              vue.$message({message: data.message, type: "success"});
+            } else {
+              vue.$message.error(data.message);
+            }
+          })
+          .catch(function (error) {
+            vue.$message.error(ApiConstant.error_500);
+            console.log("error:", error);
+          })
       },
       backBtn: function () {
         window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/rule/search/all")

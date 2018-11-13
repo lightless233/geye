@@ -18,6 +18,7 @@ from django.http import JsonResponse, HttpRequest
 
 from geye.database.models import GeyeSearchRuleModel, GeyeFilterRuleModel
 from geye.utils.log import logger
+from geye.utils.validator import RequestValidator
 
 
 class ListSearchRuleView(View):
@@ -55,17 +56,29 @@ class AddSearchRuleView(View):
     """
     @staticmethod
     def post(request: HttpRequest):
-
-        logger.debug("POST: {}".format(request.POST))
-
+        logger.debug("POST: {}".format(request.body))
         r_json = {
             "code": 1001,
             "message": "",
             "data": ""
         }
 
-        rule_name = request.POST.get("ruleName")
-        rule_content = request.POST.get("ruleContent")
+        # 简单的检查参数是否为空
+        result = RequestValidator.check_params(
+            request,
+            ["ruleName", "ruleContent", "status", "defaultFilter", "delay", "priority", "notification", "clone"],
+            check_empty=True
+        )
+        logger.debug("check result: {}".format(result))
+        if result.get("has_error"):
+            r_json["code"] = 1004
+            r_json["message"] = result.get("error_message")
+            logger.error("error_message: {}".format(result.get("error_message")))
+            return JsonResponse(r_json)
+        request_data = result.get("params")
+
+        rule_name = request_data.get("ruleName")
+        rule_content = request_data.get("ruleContent")
 
         # 检查rule name是否存在
         if GeyeSearchRuleModel.instance.is_exist(rule_name):
@@ -73,18 +86,18 @@ class AddSearchRuleView(View):
             r_json["message"] = "规则名称已存在!"
             return JsonResponse(r_json)
 
-        status = request.POST.get("status", 0)
-        default_filter = request.POST.get("defaultFilter", 1)
+        status = request_data.get("status", 0)
+        default_filter = request_data.get("defaultFilter", 1)
         default_filter = int(default_filter)
-        delay: str = request.POST.get("delay", 30)
-        priority: str = request.POST.get("priority", 5)
+        delay: str = request_data.get("delay", "30")
+        priority: str = request_data.get("priority", "5")
 
         # 检查优先级和delay
-        if not priority.isdigit():
+        if isinstance(priority, str) and not priority.isdigit():
             r_json["code"] = 1003
             r_json["message"] = "非法的优先级!"
             return JsonResponse(r_json)
-        if not delay.isdigit():
+        if isinstance(delay, str) and not delay.isdigit():
             r_json["code"] = 1003
             r_json["message"] = "非法的搜索间隔时间!"
 
