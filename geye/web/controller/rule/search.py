@@ -12,11 +12,13 @@
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+import json
 
 from django.views import View
 from django.http import JsonResponse, HttpRequest
 
 from geye.database.models import GeyeSearchRuleModel, GeyeFilterRuleModel
+from geye.utils.convert import CommonConvert
 from geye.utils.log import logger
 from geye.utils.validator import RequestValidator
 
@@ -37,12 +39,12 @@ class ListSearchRuleView(View):
                 "rule_content": row.rule,
                 "status": row.status,
                 "priority": row.priority,
-                "last_refresh_time": row.last_refresh_time,
+                "last_refresh_time": CommonConvert.datetime_to_str(row.last_refresh_time),
                 "delay": row.delay,
                 "need_notification": row.need_notification,
                 "clone": row.clone,
-                "created_time": row.created_time,
-                "updated_time": row.updated_time,
+                "created_time": CommonConvert.datetime_to_str(row.created_time),
+                "updated_time": CommonConvert.datetime_to_str(row.updated_time),
             })
 
         return JsonResponse({
@@ -127,3 +129,21 @@ class AddSearchRuleView(View):
         r_json["message"] = "创建成功!"
         r_json["data"] = obj.id
         return JsonResponse(r_json)
+
+
+class DeleteSearchRuleView(View):
+    @staticmethod
+    def post(request):
+        srid = json.loads(request.body).get("id", None)
+        logger.debug("srid: {}".format(srid))
+        # logger.debug("request body: {}".format(json.loads(request.body)))
+        if not srid:
+            return JsonResponse({"code": 1004, "message": "规则id有误!"})
+
+        if not GeyeSearchRuleModel.instance.is_exist_by_pk(srid):
+            return JsonResponse({"code": 1003, "message": "规则id不存在!"})
+
+        if not GeyeSearchRuleModel.instance.fake_delete(pk=srid):
+            return JsonResponse({"code": 1002, "message": "删除失败!"})
+        else:
+            return JsonResponse({"code": 1001, "message": "删除成功!"})

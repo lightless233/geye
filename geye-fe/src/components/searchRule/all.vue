@@ -27,13 +27,18 @@
         </el-table-column>
         <el-table-column label="#" prop="id"></el-table-column>
         <el-table-column label="规则名称" prop="rule_name"></el-table-column>
-        <el-table-column label="状态" prop="status"></el-table-column>
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.status === 1">开启</el-tag>
+            <el-tag v-else-if="scope.row.status === 0" type="error">关闭</el-tag>
+            <el-tag v-else>未知</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="上次搜索时间" prop="last_refresh_time"></el-table-column>
-        <el-table-column label="操作" width="250px">
+        <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button size="mini" type="primary">编辑</el-button>
-            <el-button size="mini">切换状态</el-button>
-            <el-button size="mini" type="danger">删除</el-button>
+            <el-button size="mini" type="danger" @click="deleteSearchRule(scope.row.id, scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -51,8 +56,7 @@
     name: "search-rule-management",
     data() {
       return {
-        tableData5: [],
-        searchRules: null
+        searchRules: []
       }
     },
     mounted() {
@@ -67,12 +71,31 @@
           }
         })
         .catch(error => {
+          console.error("error:", error);
           this.$message.error(HttpConstant.error_500);
         })
     },
     methods: {
       newSearchRuleButton: function () {
         this.$router.push({"name": "new-search-rule"});
+      },
+
+      deleteSearchRule: function (id, tableIndex) {
+        console.log("id:", id);
+        // todo 弹窗二次确认!
+        ruleServices.deleteSearchRule(this, {"id": id})
+          .then(response => {
+            if (response.data.code === 1001) {
+              this.$message.success(response.data.message);
+              this.searchRules.splice(tableIndex, 1);
+            } else {
+              this.$message.error(response.data.message);
+            }
+          })
+          .catch(error => {
+            console.log("error:", error);
+            this.$message.error(HttpConstant.error_500);
+          });
       }
     }
   }

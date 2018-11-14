@@ -18,6 +18,17 @@ from geye.utils.log import logger
 from ..base import GeyeBaseModel
 
 
+class SearchRuleConvert:
+    @staticmethod
+    def convert_status(status: int, html_template="<el-tag type=\"{t}\">{c}</el-tag>"):
+        if status == 1:
+            return html_template.format(t="success", c="开启") if html_template else "开启"
+        elif status == 0:
+            return html_template.format(t="danger", c="关闭") if html_template else "关闭"
+        else:
+            return html_template.format(t="", c="未知") if html_template else "未知"
+
+
 class SearchRuleManager(models.Manager):
     def get_all_search_rules(self):
         """
@@ -33,6 +44,17 @@ class SearchRuleManager(models.Manager):
         """
         # logger.debug("rule name: {}, exist: {}".format(rule_name, self.filter(is_deleted=0, name=rule_name).first()))
         return True if self.filter(is_deleted=0, name=rule_name).first() else False
+
+    def is_exist_by_pk(self, pk):
+        return True if self.filter(is_deleted=0, id=pk).first() else False
+
+    def fake_delete(self, pk=None, rule_name=None):
+        if pk:
+            return self.filter(is_deleted=0, id=pk).update(is_deleted=1)
+        if rule_name:
+            return self.filter(is_deleted=0, name=rule_name).update(is_deleted=1)
+
+        return None
 
 
 class GeyeSearchRuleModel(GeyeBaseModel):

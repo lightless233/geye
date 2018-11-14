@@ -29,4 +29,5 @@ urlpatterns = [
 
     path("v1/rule/search/all", search.ListSearchRuleView.as_view()),
     path("v1/rule/search/new", search.AddSearchRuleView.as_view()),
+    path("v1/rule/search/delete", search.DeleteSearchRuleView.as_view()),
 ]
