@@ -14,6 +14,7 @@
 
 from django.db import models
 
+from geye.utils.log import logger
 from ..base import GeyeBaseModel
 
 
@@ -30,6 +31,7 @@ class SearchRuleManager(models.Manager):
         :param rule_name:
         :return:
         """
+        # logger.debug("rule name: {}, exist: {}".format(rule_name, self.filter(is_deleted=0, name=rule_name).first()))
         return True if self.filter(is_deleted=0, name=rule_name).first() else False
 
 

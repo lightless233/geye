@@ -126,6 +126,9 @@
             let data = response.data;
             if (data.code === 1001) {
               vue.$message({message: data.message, type: "success"});
+              window.setTimeout(function () {
+                vue.backBtn();
+              }, 1500)
             } else {
               vue.$message.error(data.message);
             }

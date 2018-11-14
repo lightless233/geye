@@ -32,15 +32,17 @@ class ListSearchRuleView(View):
         rows = GeyeSearchRuleModel.instance.get_all_search_rules()
         for row in rows:
             results.append({
-                "name": row.name,
-                "rule": row.rule,
+                "id": row.id,
+                "rule_name": row.name,
+                "rule_content": row.rule,
                 "status": row.status,
                 "priority": row.priority,
                 "last_refresh_time": row.last_refresh_time,
                 "delay": row.delay,
                 "need_notification": row.need_notification,
                 "clone": row.clone,
-                "created_time": row.created_time
+                "created_time": row.created_time,
+                "updated_time": row.updated_time,
             })
 
         return JsonResponse({
