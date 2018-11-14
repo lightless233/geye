@@ -37,7 +37,7 @@
         <el-table-column label="上次搜索时间" prop="last_refresh_time"></el-table-column>
         <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary">编辑</el-button>
+            <el-button size="mini" type="primary" @click="editSearchRule(scope.row.id)">编辑</el-button>
             <el-button size="mini" type="danger" @click="deleteSearchRule(scope.row.id, scope.$index)">删除</el-button>
           </template>
         </el-table-column>
@@ -96,6 +96,10 @@
             console.log("error:", error);
             this.$message.error(HttpConstant.error_500);
           });
+      },
+
+      editSearchRule: function (id) {
+        this.$router.push({"name": "edit-search-rule"});
       }
     }
   }
