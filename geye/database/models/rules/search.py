@@ -13,6 +13,8 @@
 """
 
 from django.db import models
+from django.db.models import F
+from django.db import transaction
 
 from geye.utils.log import logger
 from ..base import GeyeBaseModel
@@ -34,7 +36,7 @@ class SearchRuleManager(models.Manager):
         """
         获取所有的search rule
         """
-        return self.filter(is_deleted=0).all()
+        return self.filter(is_deleted=0).order_by("id").all()
 
     def is_exist(self, rule_name):
         """
@@ -55,6 +57,23 @@ class SearchRuleManager(models.Manager):
             return self.filter(is_deleted=0, name=rule_name).update(is_deleted=1)
 
         return None
+
+    def change_status(self, pk=None, rule_name=None):
+        with transaction.atomic():
+            if pk:
+                obj = self.select_for_update().filter(is_deleted=0, id=pk)
+            elif rule_name:
+                obj = self.select_for_update().filter(is_deleted=0, name=rule_name)
+            else:
+                return None
+
+            obj = obj.first()
+            if not obj:
+                return None
+            obj.status = not obj.status
+            obj.save()
+
+            return obj
 
 
 class GeyeSearchRuleModel(GeyeBaseModel):

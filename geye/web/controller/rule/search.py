@@ -131,6 +131,21 @@ class AddSearchRuleView(View):
         return JsonResponse(r_json)
 
 
+class ChangeStatusSearchRuleView(View):
+    @staticmethod
+    def post(request):
+        srid = json.loads(request.body).get("id", None)
+        if not srid:
+            return JsonResponse({"code": 1004, "message": "规则id有误!"})
+        if not GeyeSearchRuleModel.instance.is_exist_by_pk(srid):
+            return JsonResponse({"code": 1003, "message": "规则id不存在!"})
+
+        if not GeyeSearchRuleModel.instance.change_status(pk=srid):
+            return JsonResponse({"code": 1002, "message": "切换规则状态!"})
+        else:
+            return JsonResponse({"code": 1001, "message": "切换规则状态成功!"})
+
+
 class DeleteSearchRuleView(View):
     @staticmethod
     def post(request):

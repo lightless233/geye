@@ -29,8 +29,8 @@
         <el-table-column label="规则名称" prop="rule_name"></el-table-column>
         <el-table-column label="状态">
           <template slot-scope="scope">
-            <el-tag type="success" v-if="scope.row.status === 1">开启</el-tag>
-            <el-tag v-else-if="scope.row.status === 0" type="error">关闭</el-tag>
+            <el-tag type="success" v-if="scope.row.status === 1" @click.native="changeStatus(scope.row.id, scope.$index)">开启</el-tag>
+            <el-tag type="danger" v-else-if="scope.row.status === 0" @click.native="changeStatus(scope.row.id, scope.$index)">关闭</el-tag>
             <el-tag v-else>未知</el-tag>
           </template>
         </el-table-column>
@@ -99,8 +99,27 @@
       },
 
       editSearchRule: function (id) {
+        // todo
         this.$router.push({"name": "edit-search-rule"});
+      },
+
+      changeStatus: function (id, tableIndex) {
+        ruleServices.changeStatus(this, {"id": id})
+          .then(response => {
+            if (response.data.code === 1001) {
+              this.$message.success(response.data.message);
+              let status = this.searchRules[tableIndex].status;
+              this.searchRules[tableIndex].status = status === 1 ? 0 : 1;
+            } else {
+              this.$message.error(response.data.message);
+            }
+          })
+          .catch(error => {
+            console.error("error:", error);
+            this.$message.error(HttpConstant.error_500);
+          })
       }
+
     }
   }
 </script>
@@ -109,6 +128,7 @@
   .table-expand {
     font-size: 0;
   }
+
   /*这个CSS不知道为啥不生效*/
   .table-expand label {
     width: 90px;
@@ -119,5 +139,9 @@
     margin-right: 0;
     margin-bottom: 0;
     width: 50%;
+  }
+
+  .el-tag {
+    cursor: pointer;
   }
 </style>
