@@ -75,6 +75,14 @@ class SearchRuleManager(models.Manager):
 
             return obj
 
+    def get_detail(self, pk=None, rule_name=None):
+        if pk:
+            return self.filter(is_deleted=0, id=pk).first()
+        elif rule_name:
+            return self.filter(is_deleted=0, name=rule_name).first()
+        else:
+            return None
+
 
 class GeyeSearchRuleModel(GeyeBaseModel):
     """

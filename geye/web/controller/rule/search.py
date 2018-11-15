@@ -27,9 +27,9 @@ class ListSearchRuleView(View):
     """
     返回所有的search rule
     """
+
     @staticmethod
     def get(request):
-
         results = []
         rows = GeyeSearchRuleModel.instance.get_all_search_rules()
         for row in rows:
@@ -58,6 +58,7 @@ class AddSearchRuleView(View):
     """
     添加一条search rule
     """
+
     @staticmethod
     def post(request: HttpRequest):
         logger.debug("POST: {}".format(request.body))
@@ -162,3 +163,44 @@ class DeleteSearchRuleView(View):
             return JsonResponse({"code": 1002, "message": "删除失败!"})
         else:
             return JsonResponse({"code": 1001, "message": "删除成功!"})
+
+
+class GetDetailView(View):
+    @staticmethod
+    def get(request):
+        srid = request.GET.get("id", None)
+        rule_name = request.GET.get("rule_name", None)
+        logger.debug("srid: {}, rule_name: {}".format(srid, rule_name))
+        if not srid and not rule_name:
+            return JsonResponse({"code": 1004, "message": "id和rule_name均有误"})
+
+        search_rule_obj = GeyeSearchRuleModel.instance.get_detail(pk=srid, rule_name=rule_name)
+        if not search_rule_obj:
+            return JsonResponse({"code": 1003, "message": "规则不存在!"})
+
+        filter_rule_obj = GeyeFilterRuleModel.instance.get_filter_rules_by_srid(srid, contains_global_rule=False)
+
+        rv = {
+            "search_rule": {
+                "ruleName": search_rule_obj.name,
+                "ruleContent": search_rule_obj.rule,
+                "status": search_rule_obj.status,
+                "priority": search_rule_obj.priority,
+                "delay": search_rule_obj.delay,
+                "needNotification": int(search_rule_obj.need_notification),
+                "clone": int(search_rule_obj.clone),
+            },
+            "filter_rule": [{
+                "name": fr.name,
+                "ruleType": fr.rule_type,
+                "ruleEngine": fr.rule_engine,
+                "rule": fr.rule,
+                "status": fr.status,
+                "parentId": fr.parent_id,
+                "action": fr.action,
+                "position": fr.position,
+                "priority": fr.priority
+            } for fr in filter_rule_obj],
+        }
+
+        return JsonResponse({"code": 1001, "message": "success", "data": rv})

@@ -10,7 +10,7 @@
     </div>
     <div class="container">
       <div align="right">
-        <el-button type="primary" @click="newSearchRuleButton">新建规则</el-button>
+        <el-button type="primary" @click="newSearchRuleButton" size="small" round>新建规则</el-button>
       </div>
       <el-table :data="searchRules" style="width: 100%">
         <el-table-column type="expand">
@@ -99,8 +99,7 @@
       },
 
       editSearchRule: function (id) {
-        // todo
-        this.$router.push({"name": "edit-search-rule"});
+        this.$router.push({"name": "edit-search-rule", params: {"srid": id}});
       },
 
       changeStatus: function (id, tableIndex) {

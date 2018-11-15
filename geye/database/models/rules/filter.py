@@ -20,7 +20,7 @@ from ..base import GeyeBaseModel
 
 
 class FilterRuleManager(models.Manager):
-    def get_filter_rules_by_srid(self, srid, contains_global_rule=True):
+    def get_filter_rules_by_srid(self, srid, contains_global_rule=True) -> list:
         """
         返回指定SRID对应的全部filter规则
         :param srid:
