@@ -15,7 +15,14 @@ Including another URLconf
 """
 from django.urls import path, include
 
+from geye.web.controller.system import csrf
+
 
 urlpatterns = [
+
+    # CSRF Token 路由
+    path("api/_csrf_token", csrf.CSRFTokenView.as_view()),
+
+    # API路由
     path("api/", include("geye.web.urls")),
 ]

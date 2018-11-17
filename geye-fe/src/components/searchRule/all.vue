@@ -12,7 +12,7 @@
       <div align="right">
         <el-button type="primary" @click="newSearchRuleButton" size="small" round>新建规则</el-button>
       </div>
-      <el-table :data="searchRules" style="width: 100%">
+      <el-table :data="searchRules" style="width: 100%" v-loading="loading">
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-form label-position="left" inline class="table-expand">
@@ -56,10 +56,12 @@
     name: "search-rule-management",
     data() {
       return {
-        searchRules: []
+        searchRules: [],
+        loading: false,
       }
     },
     mounted() {
+      this.loading = true;
       ruleServices.all(this)
         .then(response => {
           let responseData = response.data;
@@ -73,6 +75,9 @@
         .catch(error => {
           console.error("error:", error);
           this.$message.error(HttpConstant.error_500);
+        })
+        .then(_ => {
+          this.loading = false;
         })
     },
     methods: {

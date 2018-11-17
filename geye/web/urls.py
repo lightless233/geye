@@ -12,11 +12,9 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 
-
-from django.urls import path, include
+from django.urls import path
 
 from .controller.rule import search
-from .controller.system import csrf
 
 
 # 总的路由
@@ -25,11 +23,10 @@ from .controller.system import csrf
 # api下的总路由
 urlpatterns = [
 
-    path("_csrf_token", csrf.CSRFTokenView.as_view()),
-
     path("v1/rule/search/all", search.ListSearchRuleView.as_view()),
     path("v1/rule/search/new", search.AddSearchRuleView.as_view()),
     path("v1/rule/search/delete", search.DeleteSearchRuleView.as_view()),
     path("v1/rule/search/change_status", search.ChangeStatusSearchRuleView.as_view()),
     path("v1/rule/search/get_detail", search.GetDetailView.as_view()),
+    path("v1/rule/search/update", search.UpdateSearchRuleView.as_view()),
 ]

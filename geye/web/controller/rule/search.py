@@ -191,6 +191,7 @@ class GetDetailView(View):
                 "clone": int(search_rule_obj.clone),
             },
             "filter_rule": [{
+                "id": fr.id,
                 "name": fr.name,
                 "ruleType": fr.rule_type,
                 "ruleEngine": fr.rule_engine,
@@ -204,3 +205,55 @@ class GetDetailView(View):
         }
 
         return JsonResponse({"code": 1001, "message": "success", "data": rv})
+
+
+class UpdateSearchRuleView(View):
+    @staticmethod
+    def post(request):
+        logger.debug("POST: {}".format(request.body))
+        result = RequestValidator.check_params(
+            request, check_empty=True,
+            check_params=["id", "ruleName", "ruleContent", "status", "needNotification", "clone", "delay", "priority"]
+        )
+        if result["has_error"]:
+            em = result["error_message"]
+            logger.error("error_message: {}".format(em))
+            return JsonResponse({"code": 1004, "message": em})
+
+        request_data = result["params"]
+
+        # 检查ID是否存在
+        srid = request_data.get("id", None)
+        if not srid:
+            return JsonResponse({"code": 1004, "message": "规则ID有误!"})
+        if not GeyeSearchRuleModel.instance.is_exist_by_pk(srid):
+            return JsonResponse({"code": 1003, "message": "规则ID不存在!"})
+
+        rule_name = request_data.get("ruleName")
+        rule_content = request_data.get("ruleContent")
+        status = request_data.get("status")
+        delay: str = request_data.get("delay")
+        priority: str = request_data.get("priority")
+
+        if isinstance(priority, str) and not priority.isdigit():
+            return JsonResponse({"code": 1003, "message": "优先级有误!"})
+        if isinstance(delay, str) and not delay.isdigit():
+            return JsonResponse({"code": 1003, "message": "刷新间隔有误!"})
+
+        # str -> int
+        delay = int(delay) if isinstance(delay, str) else delay
+        priority = int(priority) if isinstance(priority, str) else priority
+
+        need_notification = 0
+        clone = 0
+
+        # update db
+        obj = GeyeSearchRuleModel.instance.filter(is_deleted=0, id=srid).update(
+            name=rule_name, rule=rule_content, status=status,
+            priority=priority, delay=delay, need_notification=need_notification, clone=clone
+        )
+
+        if obj:
+            return JsonResponse({"code": 1001, "message": "更新规则成功!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "更新规则失败!"})

@@ -7,6 +7,7 @@ const API_LIST = {
   deleteSearchRule: BASE_API + "/api/v1/rule/search/delete",
   changeSearchRuleStatus: BASE_API + "/api/v1/rule/search/change_status",
   getDetail: BASE_API + "/api/v1/rule/search/get_detail",
+  updateSearchRule: BASE_API + "/api/v1/rule/search/update"
 };
 
 
@@ -21,12 +22,12 @@ const services = {
   },
 
   deleteSearchRule(context, data) {
-    return context.axios.post(API_LIST.deleteSearchRule, data)
+    return context.axios.post(API_LIST.deleteSearchRule, data);
   },
 
   // 修改某个search rule 的状态
   changeStatus(context, data) {
-    return context.axios.post(API_LIST.changeSearchRuleStatus, data)
+    return context.axios.post(API_LIST.changeSearchRuleStatus, data);
   },
 
   // 根据id 或 rule_name获取search rule的详细信息
@@ -36,8 +37,12 @@ const services = {
   // }
   // 优先使用id获取信息
   getDetail(context, data) {
-    return context.axios.get(API_LIST.getDetail, {params: data})
-  }
+    return context.axios.get(API_LIST.getDetail, {params: data});
+  },
+
+  updateSearchRule(context, data) {
+    return context.axios.post(API_LIST.updateSearchRule, data);
+  },
 
 };
 
