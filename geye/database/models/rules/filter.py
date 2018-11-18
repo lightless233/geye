@@ -38,6 +38,12 @@ class FilterRuleManager(models.Manager):
             all_rules.append(r)
         return all_rules
 
+    def is_exist(self, pk):
+        return self.filter(is_deleted=0, id=pk).first()
+
+    def fake_delete(self, pk):
+        return self.filter(is_deleted=0, id=pk).update(is_deleted=1)
+
 
 class GeyeFilterRuleModel(GeyeBaseModel):
     """

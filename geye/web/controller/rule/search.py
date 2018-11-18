@@ -75,12 +75,12 @@ class AddSearchRuleView(View):
             check_empty=True
         )
         logger.debug("check result: {}".format(result))
-        if result.get("has_error"):
+        if result.has_error:
             r_json["code"] = 1004
-            r_json["message"] = result.get("error_message")
-            logger.error("error_message: {}".format(result.get("error_message")))
+            r_json["message"] = result.error_message
+            logger.error("error_message: {}".format(result.error_message))
             return JsonResponse(r_json)
-        request_data = result.get("params")
+        request_data = result.params
 
         rule_name = request_data.get("ruleName")
         rule_content = request_data.get("ruleContent")
@@ -178,7 +178,8 @@ class GetDetailView(View):
         if not search_rule_obj:
             return JsonResponse({"code": 1003, "message": "规则不存在!"})
 
-        filter_rule_obj = GeyeFilterRuleModel.instance.get_filter_rules_by_srid(srid, contains_global_rule=False)
+        # filter_rule_obj = GeyeFilterRuleModel.instance.get_filter_rules_by_srid(srid, contains_global_rule=False)
+        filter_rule_obj = GeyeFilterRuleModel.instance.filter(is_deleted=0, parent_id=srid).order_by("-priority").all()
 
         rv = {
             "search_rule": {
@@ -215,12 +216,12 @@ class UpdateSearchRuleView(View):
             request, check_empty=True,
             check_params=["id", "ruleName", "ruleContent", "status", "needNotification", "clone", "delay", "priority"]
         )
-        if result["has_error"]:
-            em = result["error_message"]
+        if result.has_error:
+            em = result.error_message
             logger.error("error_message: {}".format(em))
             return JsonResponse({"code": 1004, "message": em})
 
-        request_data = result["params"]
+        request_data = result.params
 
         # 检查ID是否存在
         srid = request_data.get("id", None)

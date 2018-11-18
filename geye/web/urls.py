@@ -14,7 +14,7 @@
 
 from django.urls import path
 
-from .controller.rule import search
+from .controller.rule import search, filter
 
 
 # 总的路由
@@ -22,11 +22,15 @@ from .controller.rule import search
 
 # api下的总路由
 urlpatterns = [
-
+    # search rule URL
     path("v1/rule/search/all", search.ListSearchRuleView.as_view()),
     path("v1/rule/search/new", search.AddSearchRuleView.as_view()),
     path("v1/rule/search/delete", search.DeleteSearchRuleView.as_view()),
     path("v1/rule/search/change_status", search.ChangeStatusSearchRuleView.as_view()),
     path("v1/rule/search/get_detail", search.GetDetailView.as_view()),
     path("v1/rule/search/update", search.UpdateSearchRuleView.as_view()),
+
+    # filter rule URL
+    path("v1/rule/filter/new", filter.AddFilterRuleView.as_view()),
+    path("v1/rule/filter/delete", filter.DeleteFilterRuleView.as_view()),
 ]

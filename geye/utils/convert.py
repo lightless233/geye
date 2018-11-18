@@ -19,3 +19,7 @@ class CommonConvert:
     @staticmethod
     def datetime_to_str(d: datetime.datetime):
         return d.strftime("%Y-%m-%d %H:%M:%S")
+
+    @staticmethod
+    def ensure_int(arg):
+        return arg if isinstance(arg, int) else int(arg)

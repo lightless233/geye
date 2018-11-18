@@ -12,7 +12,7 @@
       </el-breadcrumb>
     </div>
 
-    <div class="container">
+    <div class="container" v-loading="loading">
       <el-form ref="searchRuleForm" :model="searchRuleForm" label-width="100px" :disabled="isDisabled">
         <el-form-item label="规则名称">
           <el-input v-model="searchRuleForm.ruleName"></el-input>
@@ -68,7 +68,7 @@
 
         <el-row>
           <el-col :span="24" align="right">
-            <el-button type="primary" @click="updateConfirm">确认修改</el-button>
+            <el-button type="primary" @click="updateSearchRuleButton">确认修改</el-button>
             <el-button type="primary" plain @click="backBtn">返回规则列表</el-button>
           </el-col>
         </el-row>
@@ -77,14 +77,14 @@
     </div>
 
     <!-- 展示filter rule的表格部分-->
-    <div class="container" style="margin-top: 20px">
+    <div class="container" style="margin-top: 20px" v-loading="loading">
       <el-row>
         <el-col :span="12">
           <h4>过滤规则列表</h4>
         </el-col>
         <el-col :span="12" align="right">
           <div align="right">
-            <el-button type="primary" @click="showFilterRuleDialog = true" size="small" round>新建过滤规则</el-button>
+            <el-button type="primary" @click="openFilterRuleDialog('new', -1)" size="small" round>新建过滤规则</el-button>
           </div>
         </el-col>
       </el-row>
@@ -134,8 +134,8 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" @click="editFilterRule(scope.row.id)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="deleteFilterRule(scope.row.id)">删除</el-button>
+            <el-button size="mini" type="primary" @click="openFilterRuleDialog('edit', scope.row.id)">编辑</el-button>
+            <el-button size="mini" type="danger" @click="deleteFilterRule(scope.row.id, scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -214,7 +214,7 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="confirmNewFilterRule">确 认</el-button>
+        <el-button type="primary" @click="confirmFilterRuleButton">确 认</el-button>
         <el-button type="danger" @click="showFilterRuleDialog = false">关 闭</el-button>
       </div>
     </el-dialog>
@@ -232,6 +232,7 @@
     name: "edit-search-rule",
     data() {
       return {
+        loading: false,
         searchRuleForm: {
           id: this.$route.params.srid,
           ruleName: "",
@@ -248,6 +249,8 @@
         showFilterRuleDialog: false,
         isDisableFilterRuleForm: false,
         dialogTitle: "新建过滤规则",
+        editingFilterRuleId: -1,
+        dialogType: "",
         filterRuleForm: {
           name: "",
           ruleType: 1,
@@ -261,6 +264,7 @@
       }
     },
     mounted: function () {
+      this.loading = true;
       searchRuleService.getDetail(this, {"id": this.$route.params.srid})
         .then(response => {
           let responseData = response.data;
@@ -274,6 +278,9 @@
           this.isDisabled = true;
           this.$message.error(ApiConstant.error_500);
         })
+        .then(_ => {
+          this.loading = false;
+        })
     },
     methods: {
       goSearchRuleList: function () {
@@ -284,7 +291,7 @@
         window.history.length > 1 ? this.$router.go(-1) : this.$router.push({"name": "all-search-rule"})
       },
 
-      updateConfirm: function () {
+      updateSearchRuleButton: function () {
         this.searchRuleForm.id = this.$route.params.srid;
         console.log("searchRuleForm:", this.searchRuleForm);
         searchRuleService.updateSearchRule(this, this.searchRuleForm)
@@ -302,13 +309,84 @@
           })
       },
 
-      confirmNewFilterRule: function () {
-        this.filterRuleForm.id = this.$route.params.srid;
-        filterRuleService.addFilterRule(this, this.filterRuleForm)
+      openFilterRuleDialog: function (type, id) {
+        this.dialogType = type;
+        this.editingFilterRuleId = id;
+        if (this.dialogType === "new") {
+          this.dialogTitle = "新建过滤规则";
+          this.initFilterRuleForm();
+        } else if (this.dialogType === "edit") {
+          // 编辑filter rule，先获取要编辑的规则内容，并且填充表单
+          filterRuleService.getFilterRuleDetail(this, {"id": this.editingFilterRuleId})
+            .then(response => {
+              // 加载成功，设置内容
+              if (response.data.code === 1001) {
+                this.dialogTitle = "编辑过滤规则";
+                this.filterRuleForm = {
+                  name: "",
+                  ruleType: 1,
+                  ruleEngine: 2,
+                  ruleContent: "",
+                  status: 1,
+                  action: 5,
+                  position: 4,
+                  priority: 5,
+                }
+              } else {
+                this.$message.error(response.data.message);
+              }
+
+            })
+            .catch(err => {
+              console.log("error: ", err);
+              this.$message.error(ApiConstant.error_500);
+            });
+
+        }
+        this.showFilterRuleDialog = true;
+      },
+
+      confirmFilterRuleButton: function () {
+        if (this.dialogType === "new") {
+          this.filterRuleForm.id = this.$route.params.srid;
+          filterRuleService.addFilterRule(this, this.filterRuleForm)
+            .then(response => {
+              if (response.data.code === 1001) {
+                this.$message.success(response.data.message);
+                this.showFilterRuleDialog = false;
+                this.filterRuleList.push(response.data.data);
+              } else {
+                this.$message.error(response.data.message);
+              }
+            })
+            .catch(err => {
+              console.error("error:", err);
+              this.$message.error(ApiConstant.error_500);
+            });
+        } else if (this.dialogType === "edit") {
+
+        }
+      },
+
+      initFilterRuleForm: function () {
+        this.filterRuleForm = {
+          name: "",
+          ruleType: 1,
+          ruleEngine: 2,
+          ruleContent: "",
+          status: 1,
+          action: 5,
+          position: 4,
+          priority: 5,
+        }
+      },
+
+      deleteFilterRule: function (id, tableIndex) {
+        filterRuleService.deleteFilterRule(this, {"id": id})
           .then(response => {
             if (response.data.code === 1001) {
               this.$message.success(response.data.message);
-              this.showFilterRuleDialog = false;
+              this.filterRuleList.splice(tableIndex, 1);
             } else {
               this.$message.error(response.data.message);
             }
@@ -317,10 +395,7 @@
             console.error("error:", err);
             this.$message.error(ApiConstant.error_500);
           });
-
-      },
-
-
+      }
     }
   }
 </script>
