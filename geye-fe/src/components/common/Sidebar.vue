@@ -51,7 +51,7 @@
             title: "规则管理",
             subs: [
               {
-                index: "/rule/global-filter-rule-management",
+                index: "/rule/global/filter",
                 title: "全局过滤规则管理",
               },
               {

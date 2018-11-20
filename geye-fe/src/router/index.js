@@ -27,6 +27,13 @@ const routerConf = [
     component: resolve => require(["../components/searchRule/edit.vue"], resolve),
     name: "edit-search-rule",
   },
+
+  {
+    path: "/rule/global/filter",
+    component: resolve => require(["../components/globalFilterRule.vue"], resolve),
+    name: "global-filter-rule",
+  },
+
   {
     path: "/*",
     component: resolve => require(["../components/404.vue"], resolve),
