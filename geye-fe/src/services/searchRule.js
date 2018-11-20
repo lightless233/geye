@@ -1,4 +1,4 @@
-import config from "@/config";
+import config from "@/config/index";
 
 const BASE_API = config.BASE_API;
 const API_LIST = {

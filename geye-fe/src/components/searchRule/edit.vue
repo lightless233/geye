@@ -143,7 +143,7 @@
     </div>
 
     <!-- 添加/编辑 过滤规则的对话框 -->
-    <el-dialog :title="dialogTitle" :visible.sync="showFilterRuleDialog" :fullscreen="true">
+    <el-dialog :title="dialogTitle" :visible.sync="showFilterRuleDialog" :fullscreen="false">
       <el-form :model="filterRuleForm" label-width="100px" :disabled="isDisableFilterRuleForm">
         <el-form-item label="规则标题">
           <el-input v-model="filterRuleForm.name" autocomplete="off"></el-input>
