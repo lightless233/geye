@@ -14,7 +14,7 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 
-from django.db import models
+from django.db import models, transaction
 
 from ..base import GeyeBaseModel
 
@@ -43,6 +43,24 @@ class FilterRuleManager(models.Manager):
 
     def fake_delete(self, pk):
         return self.filter(is_deleted=0, id=pk).update(is_deleted=1)
+
+    def get_detail(self, pk):
+        return self.filter(is_deleted=0, id=pk).first()
+
+    def update_filter_rule(self, params: dict) -> "GeyeFilterRuleModel":
+        with transaction.atomic():
+            obj: GeyeFilterRuleModel = self.select_for_update().filter(is_deleted=0, id=params.get("id")).first()
+            obj.name = params.get("name")
+            obj.rule = params.get("ruleContent")
+            obj.rule_type = params.get("ruleType")
+            obj.rule_engine = params.get("ruleEngine")
+            obj.status = params.get("status")
+            obj.action = params.get("action")
+            obj.position = params.get("position")
+            obj.priority = params.get("priority")
+
+            obj.save()
+            return obj
 
 
 class GeyeFilterRuleModel(GeyeBaseModel):

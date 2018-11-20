@@ -33,4 +33,6 @@ urlpatterns = [
     # filter rule URL
     path("v1/rule/filter/new", filter.AddFilterRuleView.as_view()),
     path("v1/rule/filter/delete", filter.DeleteFilterRuleView.as_view()),
+    path("v1/rule/filter/detail", filter.GetFilterRuleDetailView.as_view()),
+    path("v1/rule/filter/update", filter.UpdateFilterRuleView.as_view()),
 ]

@@ -84,7 +84,7 @@
         </el-col>
         <el-col :span="12" align="right">
           <div align="right">
-            <el-button type="primary" @click="openFilterRuleDialog('new', -1)" size="small" round>新建过滤规则</el-button>
+            <el-button type="primary" @click="openFilterRuleDialog('new', -1, -1)" size="small" round>新建过滤规则</el-button>
           </div>
         </el-col>
       </el-row>
@@ -134,7 +134,8 @@
         </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" @click="openFilterRuleDialog('edit', scope.row.id)">编辑</el-button>
+            <el-button size="mini" type="primary" @click="openFilterRuleDialog('edit', scope.row.id, scope.$index)">编辑
+            </el-button>
             <el-button size="mini" type="danger" @click="deleteFilterRule(scope.row.id, scope.$index)">删除</el-button>
           </template>
         </el-table-column>
@@ -214,7 +215,7 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="confirmFilterRuleButton">确 认</el-button>
+        <el-button type="primary" @click="confirmFilterRuleButton">{{dialogConfirmBtnText}}</el-button>
         <el-button type="danger" @click="showFilterRuleDialog = false">关 闭</el-button>
       </div>
     </el-dialog>
@@ -249,7 +250,9 @@
         showFilterRuleDialog: false,
         isDisableFilterRuleForm: false,
         dialogTitle: "新建过滤规则",
+        dialogConfirmBtnText: "添 加",
         editingFilterRuleId: -1,
+        lastTableIndex: -1,
         dialogType: "",
         filterRuleForm: {
           name: "",
@@ -309,41 +312,48 @@
           })
       },
 
-      openFilterRuleDialog: function (type, id) {
+      openFilterRuleDialog: function (type, id, tableIdx) {
         this.dialogType = type;
         this.editingFilterRuleId = id;
+        this.lastTableIndex = tableIdx;
         if (this.dialogType === "new") {
+          // 新建过滤规则的dialog
           this.dialogTitle = "新建过滤规则";
+          this.dialogConfirmBtnText = "添 加";
           this.initFilterRuleForm();
+          this.showFilterRuleDialog = true;
         } else if (this.dialogType === "edit") {
           // 编辑filter rule，先获取要编辑的规则内容，并且填充表单
           filterRuleService.getFilterRuleDetail(this, {"id": this.editingFilterRuleId})
             .then(response => {
               // 加载成功，设置内容
               if (response.data.code === 1001) {
+                let data = response.data.data;
                 this.dialogTitle = "编辑过滤规则";
+                this.dialogConfirmBtnText = "更 新";
                 this.filterRuleForm = {
-                  name: "",
-                  ruleType: 1,
-                  ruleEngine: 2,
-                  ruleContent: "",
-                  status: 1,
-                  action: 5,
-                  position: 4,
-                  priority: 5,
-                }
+                  name: data.name,
+                  ruleType: data.ruleType,
+                  ruleEngine: data.ruleEngine,
+                  ruleContent: data.ruleContent,
+                  status: data.status,
+                  action: data.action,
+                  position: data.position,
+                  priority: data.priority,
+                };
+                // 打开dialog
+                this.showFilterRuleDialog = true;
               } else {
                 this.$message.error(response.data.message);
               }
-
             })
             .catch(err => {
+              // 获取待编辑的filter rule的详细信息失败了
               console.log("error: ", err);
               this.$message.error(ApiConstant.error_500);
             });
 
         }
-        this.showFilterRuleDialog = true;
       },
 
       confirmFilterRuleButton: function () {
@@ -364,7 +374,22 @@
               this.$message.error(ApiConstant.error_500);
             });
         } else if (this.dialogType === "edit") {
-
+          this.filterRuleForm.id = this.editingFilterRuleId;
+          filterRuleService.updateFilterRule(this, this.filterRuleForm)
+            .then(resp => {
+              if (resp.data.code === 1001) {
+                this.$message.success(resp.data.message);
+                // 根据tableIndex更新表格中展示的内容
+                this.filterRuleList[this.lastTableIndex]["name"] = this.filterRuleForm["name"];
+                this.filterRuleList[this.lastTableIndex]["status"] = this.filterRuleForm["status"];
+                this.filterRuleList[this.lastTableIndex]["ruleEngine"] = this.filterRuleForm["ruleEngine"];
+                this.filterRuleList[this.lastTableIndex]["ruleType"] = this.filterRuleForm["ruleType"];
+                this.filterRuleList[this.lastTableIndex]["action"] = this.filterRuleForm["action"];
+                this.filterRuleList[this.lastTableIndex]["position"] = this.filterRuleForm["position"];
+              } else {
+                this.$message.error(resp.data.message);
+              }
+            })
         }
       },
 

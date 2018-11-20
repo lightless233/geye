@@ -196,7 +196,7 @@ class GetDetailView(View):
                 "name": fr.name,
                 "ruleType": fr.rule_type,
                 "ruleEngine": fr.rule_engine,
-                "rule": fr.rule,
+                "ruleContent": fr.rule,
                 "status": fr.status,
                 "parentId": fr.parent_id,
                 "action": fr.action,
