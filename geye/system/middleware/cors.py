@@ -33,8 +33,8 @@ class CORSMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        logger.debug("COOKIES: {}".format(request.COOKIES))
-        logger.debug("HEADERS: {}".format(request))
+        # logger.debug("COOKIES: {}".format(request.COOKIES))
+        # logger.debug("HEADERS: {}".format(request))
 
         origin = request.META.get("HTTP_ORIGIN", None)
         # print(origin)
