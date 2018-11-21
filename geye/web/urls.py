@@ -14,7 +14,7 @@
 
 from django.urls import path
 
-from .controller.rule import search, filter
+from .controller.rule import search, filter, globalFilter
 
 
 # 总的路由
@@ -35,4 +35,8 @@ urlpatterns = [
     path("v1/rule/filter/delete", filter.DeleteFilterRuleView.as_view()),
     path("v1/rule/filter/detail", filter.GetFilterRuleDetailView.as_view()),
     path("v1/rule/filter/update", filter.UpdateFilterRuleView.as_view()),
+
+    # global filter rule
+    path("v1/rule/global/all", globalFilter.AllGlobalFilterRulesView.as_view()),
+    path("v1/rule/global/new", globalFilter.AddGlobalFilterRuleView.as_view()),
 ]

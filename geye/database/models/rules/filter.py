@@ -62,6 +62,9 @@ class FilterRuleManager(models.Manager):
             obj.save()
             return obj
 
+    def all_global_filter_rule(self):
+        return self.filter(is_deleted=0, parent_id=0).all()
+
 
 class GeyeFilterRuleModel(GeyeBaseModel):
     """
