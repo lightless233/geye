@@ -35,6 +35,12 @@ const routerConf = [
   },
 
   {
+    path: "/rule/special-monitor",
+    component: resolve => require(["../components/SpecialMonitor.vue"], resolve),
+    name: "special-monitor",
+  },
+
+  {
     path: "/*",
     component: resolve => require(["../components/404.vue"], resolve),
   }
