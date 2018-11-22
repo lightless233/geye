@@ -41,11 +41,20 @@ class FilterRuleManager(models.Manager):
     def is_exist(self, pk):
         return self.filter(is_deleted=0, id=pk).first()
 
+    def is_exist_global(self, pk):
+        return self.filter(is_deleted=0, parent_id=0, id=pk).first()
+
     def fake_delete(self, pk):
         return self.filter(is_deleted=0, id=pk).update(is_deleted=1)
 
+    def fake_delete_global(self, pk):
+        return self.filter(is_deleted=0, id=pk, parent_id=0).update(is_deleted=1)
+
     def get_detail(self, pk):
         return self.filter(is_deleted=0, id=pk).first()
+
+    def get_detail_global(self, pk):
+        return self.filter(is_deleted=0, id=pk, parent_id=0).first()
 
     def update_filter_rule(self, params: dict) -> "GeyeFilterRuleModel":
         with transaction.atomic():

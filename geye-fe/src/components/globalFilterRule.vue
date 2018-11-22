@@ -29,7 +29,8 @@
             <el-form label-position="left" inline label-width="100px">
               <el-form-item label="规则内容">
                 <span>{{ props.row.ruleContent }}</span>
-              </el-form-item><br>
+              </el-form-item>
+              <br>
               <el-form-item label="优先级">
                 <span>{{props.row.priority}}</span>
               </el-form-item>
@@ -82,7 +83,7 @@
         <el-table-column>
           <template slot-scope="scope">
             <el-button size="mini" type="primary" @click="openDialog('edit', scope.row.id, scope.$index)">编辑</el-button>
-            <el-button size="mini" type="danger">删除</el-button>
+            <el-button size="mini" type="danger" @click="deleteRuleFn(scope.row.id, scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -165,7 +166,7 @@
 
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="dialogConfirmButton"> {{dialogConfirmButtonText}}</el-button>
-        <el-button type="danger" @click="showRuleDialog = false;">关闭</el-button>
+        <el-button type="danger" @click="showRuleDialog = false">关闭</el-button>
       </div>
 
     </el-dialog>
@@ -246,6 +247,8 @@
       },
 
       openDialog: function (type, globalRuleId, tableIdx) {
+        this.initForm();
+        this.isDisableForm = false;
         if (type === "new") {
           this.dialogType = "new";
           this.dialogTitle = "新建全局过滤规则";
@@ -258,6 +261,29 @@
           this.editingRuleId = globalRuleId;
           this.editingTableIdx = tableIdx;
           // request for detail
+          globalRuleService.getDetail(this, {"id": globalRuleId})
+            .then(resp => {
+              if (resp.data.code === 1001) {
+                this.showRuleDialog = true;
+                let data = resp.data.data;
+                this.ruleForm.id = data.id;
+                this.ruleForm.name = data.name;
+                this.ruleForm.ruleType = data.ruleType;
+                this.ruleForm.ruleEngine = data.ruleEngine;
+                this.ruleForm.ruleContent = data.ruleContent;
+                this.ruleForm.status = data.status;
+                this.ruleForm.action = data.action;
+                this.ruleForm.position = data.position;
+                this.ruleForm.priority = data.priority;
+              } else {
+                this.$message.error(resp.data.message);
+              }
+            })
+            .catch(err => {
+              this.$message.error(ApiConstant.error_500);
+              console.log("error:", err);
+              this.isDisableForm = true;
+            });
         }
       },
 
@@ -278,9 +304,46 @@
               this.$message.error(ApiConstant.error_500);
             });
         } else if (this.dialogType === "edit") {
-
+          globalRuleService.updateGlobalFilterRule(this, this.ruleForm)
+            .then(resp => {
+              if (resp.data.code === 1001) {
+                this.$message.success(resp.data.message);
+                let data = resp.data.data;
+                this.globalFilterRules[this.editingTableIdx].id = data.id;
+                this.globalFilterRules[this.editingTableIdx].name = data.name;
+                this.globalFilterRules[this.editingTableIdx].ruleType = data.ruleType;
+                this.globalFilterRules[this.editingTableIdx].ruleEngine = data.ruleEngine;
+                this.globalFilterRules[this.editingTableIdx].ruleContent = data.ruleContent;
+                this.globalFilterRules[this.editingTableIdx].status = data.status;
+                this.globalFilterRules[this.editingTableIdx].action = data.action;
+                this.globalFilterRules[this.editingTableIdx].position = data.position;
+                this.globalFilterRules[this.editingTableIdx].priority = data.priority;
+              } else {
+                this.$message.error(resp.data.message);
+              }
+            })
+            .catch(e => {
+              console.log("error:", e);
+              this.$message.error(ApiConstant.error_500);
+            });
         }
       },
+
+      deleteRuleFn: function (frid, tableIdx) {
+        globalRuleService.deleteGlobalFilterRule(this, {"id": frid})
+          .then(resp => {
+            if (resp.data.code === 1001) {
+              this.$message.success(resp.data.message);
+              this.globalFilterRules.splice(tableIdx, 1);
+            } else {
+              this.$message.error(resp.data.message);
+            }
+          })
+          .catch(err => {
+            this.$message.error(ApiConstant.error_500);
+            console.log("error:", err)
+          });
+      }
 
     }
   }

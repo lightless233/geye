@@ -39,4 +39,7 @@ urlpatterns = [
     # global filter rule
     path("v1/rule/global/all", globalFilter.AllGlobalFilterRulesView.as_view()),
     path("v1/rule/global/new", globalFilter.AddGlobalFilterRuleView.as_view()),
+    path("v1/rule/global/delete", globalFilter.DeleteGlobalFilterRuleView.as_view()),
+    path("v1/rule/global/detail", globalFilter.GetDetailView.as_view()),
+    path("v1/rule/global/update", globalFilter.UpdateGlobalFilterRuleView.as_view()),
 ]
