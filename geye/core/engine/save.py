@@ -18,6 +18,7 @@ import queue
 from django.db import Error as DBError
 
 from geye.database.models import GeyeLeaksModel
+from geye.utils.datatype import PriorityTask
 from geye.utils.log import logger
 from .base import SingleThreadEngine
 
@@ -32,8 +33,8 @@ class SaveEngine(SingleThreadEngine):
     def get_task_from_queue(self):
         while self.status == self.EngineStatus.RUNNING:
             try:
-                task = self.save_queue.get_nowait()
-                return task[0], task[1]
+                task: PriorityTask = self.save_queue.get_nowait()
+                return task.priority, task.data
             except queue.Empty:
                 self.ev.wait(1)
                 continue

@@ -41,6 +41,18 @@ const routerConf = [
   },
 
   {
+    path: "/handleCenter/search",
+    component: resolve => require(["@/components/handleCenter/SearchCenter.vue"], resolve),
+    name: "handle-center-search",
+  },
+
+  {
+    path: "/token",
+    component: resolve => require(["@/components/token/token.vue"], resolve),
+    name: "token",
+  },
+
+  {
     path: "/*",
     component: resolve => require(["../components/404.vue"], resolve),
   }

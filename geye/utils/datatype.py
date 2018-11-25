@@ -119,3 +119,15 @@ class InjectionDict(AttribDict):
         self.dbms = None
         self.dbms_version = None
         self.os = None
+
+
+class PriorityTask:
+    def __init__(self, priority: int, data):
+        self.data = data
+        self.priority = int(priority)
+
+    def __lt__(self, other: "PriorityTask"):
+        return self.priority < other.priority
+
+    def __str__(self):
+        return "<PriorityTask || Priority: {} || data: {}>".format(self.priority, self.data)

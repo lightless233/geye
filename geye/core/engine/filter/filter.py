@@ -36,6 +36,7 @@ from django.conf import settings
 from geye.core.engine.base import MultiThreadEngine
 from geye.database.models import GeyeFilterRuleModel
 from geye.database.models import LeaksStatusConstant
+from geye.utils.datatype import PriorityTask
 from geye.utils.log import logger
 from .rule import RuleEngine
 
@@ -58,8 +59,8 @@ class FilterEngine(MultiThreadEngine):
         """
         while self.status == self.EngineStatus.RUNNING:
             try:
-                task = self.filter_task_queue.get_nowait()
-                return task[0], task[1]
+                task: PriorityTask = self.filter_task_queue.get_nowait()
+                return task.priority, task.data
             except queue.Empty:
                 self.ev.wait(1)
                 continue
@@ -108,7 +109,7 @@ class FilterEngine(MultiThreadEngine):
             target_queue = self.filter_task_queue
         while self.status == self.EngineStatus.RUNNING:
             try:
-                target_queue.put_nowait(task)
+                target_queue.put_nowait(PriorityTask(task[0], task[1]))
                 break
             except queue.Full:
                 self.ev.wait(1)

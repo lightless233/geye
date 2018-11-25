@@ -66,8 +66,23 @@
           },
           {
             icon: "paper-plane",
-            index: "/handle-center",
-            title: "处理中心"
+            index: "handleCenter",
+            title: "处理中心",
+            subs: [
+              {
+                index: "/handleCenter/search",
+                title: "搜索结果",
+              },
+              {
+                index: "/handleCenter/monitor",
+                title: "监控结果",
+              }
+            ]
+          },
+          {
+            icon: "key",
+            index: "/token",
+            title: "Token管理"
           }
         ]
       }

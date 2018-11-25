@@ -24,6 +24,7 @@ import requests
 from django.conf import settings
 
 from geye.database.models import GeyeTokenModel
+from geye.utils.datatype import PriorityTask
 from .base import MultiThreadEngine
 from geye.utils.log import logger
 
@@ -56,8 +57,8 @@ class SearchEngine(MultiThreadEngine):
         """
         while self.status == self.EngineStatus.RUNNING:
             try:
-                task = self.search_task_queue.get_nowait()
-                return task[0], task[1]
+                task: PriorityTask = self.search_task_queue.get_nowait()
+                return task.priority, task.data
             except queue.Empty:
                 self.ev.wait(1)
                 continue
@@ -65,7 +66,7 @@ class SearchEngine(MultiThreadEngine):
             return None, None
 
     def push_to_queue(self, priority, filter_task):
-        task = (priority, filter_task)
+        task = PriorityTask(priority, filter_task)
         while True:
             try:
                 self.filter_task_queue.put_nowait(task)

@@ -13,7 +13,6 @@
 """
 
 from django.db import models
-from django.db.models import F
 from django.db import transaction
 
 from geye.utils.log import logger
@@ -119,5 +118,5 @@ class GeyeSearchRuleModel(GeyeBaseModel):
     need_notification = models.BooleanField(default=False)
     clone = models.BooleanField(default=False)
 
-    object = models.Manager()
+    objects = models.Manager()
     instance = SearchRuleManager()

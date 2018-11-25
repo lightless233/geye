@@ -15,6 +15,7 @@
 from django.urls import path
 
 from .controller.rule import search, filter, globalFilter
+from .controller.token import token
 
 
 # 总的路由
@@ -42,4 +43,12 @@ urlpatterns = [
     path("v1/rule/global/delete", globalFilter.DeleteGlobalFilterRuleView.as_view()),
     path("v1/rule/global/detail", globalFilter.GetDetailView.as_view()),
     path("v1/rule/global/update", globalFilter.UpdateGlobalFilterRuleView.as_view()),
+
+    # Token 相关的路由
+    path("v1/token/all", token.TokensView.as_view()),
+    path("v1/token/new", token.AddTokenView.as_view()),
+    path("v1/token/update", token.EditTokenView.as_view()),
+    path("v1/token/delete", token.DeleteTokenView.as_view()),
+    path("v1/token/change_status", token.UpdateStatus.as_view()),
+    path("v1/token/detail", token.TokenDetailsView.as_view()),
 ]

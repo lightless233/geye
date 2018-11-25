@@ -54,6 +54,8 @@ CSRF_COOKIE_SAMESITE = None
 ##########
 # Search任务队列大小
 SEARCH_TASK_QUEUE_SIZE = 1024
+FILTER_TASK_QUEUE_SIZE = 1024
+SAVE_TASK_QUEUE_SIZE = 1024
 
 ##########
 # Refresh Engine

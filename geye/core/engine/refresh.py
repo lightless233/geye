@@ -21,6 +21,7 @@ from django.conf import settings
 from .base import SingleThreadEngine
 from geye.utils.log import logger
 from geye.database.models import GeyeSearchRuleModel
+from geye.utils.datatype import PriorityTask
 
 
 class RefreshEngine(SingleThreadEngine):
@@ -53,7 +54,9 @@ class RefreshEngine(SingleThreadEngine):
                         "search_rule_name": row.name,
                         "search_rule_content": row.rule,
                     }
-                    task = (row.priority, _data)
+                    # task = (row.priority, _data)
+                    task = PriorityTask(row.priority, _data)
+                    logger.debug("task: {}".format(task))
                     while True:
                         try:
                             refresh_task_queue.put_nowait(task)
