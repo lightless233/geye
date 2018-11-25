@@ -17,7 +17,17 @@
         <el-table-column prop="id" label="#" width="100px"></el-table-column>
         <el-table-column prop="tokenName" label="Token名称"></el-table-column>
         <el-table-column prop="tokenContent" label="Token"></el-table-column>
-        <el-table-column prop="status" label="状态"></el-table-column>
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <el-tag type="success" v-if="scope.row.status === 1"
+                    @click.native="handleChangeStatus(scope.row, scope.$index)">开启
+            </el-tag>
+            <el-tag type="danger" v-else-if="scope.row.status === 0"
+                    @click.native="handleChangeStatus(scope.row, scope.$index)">关闭
+            </el-tag>
+            <el-tag v-else>未知</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="remainLimit" label="可用次数"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
@@ -125,14 +135,6 @@
           });
       },
 
-      handleEdit: function () {
-
-      },
-
-      handleAddToken: function () {
-
-      },
-
       handleConfirm: function () {
         if (this.dialogType === "add") {
           tokenService.addToken(this, this.tokenForm)
@@ -154,6 +156,22 @@
         } else {
           this.$message.error("未知错误");
         }
+      },
+
+      handleChangeStatus: function (row, tableIdx) {
+        tokenService.changeTokenStatus(this, {"id": row.id})
+          .then(resp => {
+            if (resp.data.code === 1001) {
+              this.$message.success(resp.data.message);
+              this.tokenData[tableIdx].status = !this.tokenData[tableIdx].status;
+            } else {
+              this.$message.error(resp.data.message);
+            }
+          })
+          .catch(err => {
+            console.log("error: ", err);
+            this.$message.error(ApiConstant.error_500);
+          });
       },
 
       handleOpenDialog: function (type, tableIdx, row) {

@@ -8,7 +8,7 @@ const API_LIST = {
   getAllTokens: BASE_API + "/api/v1/token/all",
   addToken: BASE_API + "/api/v1/token/new",
   updateToken: BASE_API + "/api/v1/token/update",
-  deleteToken: BASE_API + "/api/v1/token/update",
+  deleteToken: BASE_API + "/api/v1/token/delete",
   changeTokenStatus: BASE_API + "/api/v1/token/change_status",
   getTokenDetail: BASE_API + "/api/v1/token/detail",
 };

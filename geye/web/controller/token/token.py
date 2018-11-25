@@ -12,6 +12,8 @@
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+import json
+
 from django.http import JsonResponse
 from django.views import View
 
@@ -46,7 +48,15 @@ class DeleteTokenView(View):
     """
     @staticmethod
     def post(request):
-        pass
+        token_id = json.loads(request.body).get("id", None)
+        if not token_id or not GeyeTokenModel.instance.is_exist(token_id):
+            return JsonResponse({"code": 1004, "message": "token id不存在"})
+
+        obj = GeyeTokenModel.instance.fake_delete(token_id)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "删除成功!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "删除失败!"})
 
 
 class AddTokenView(View):
@@ -84,8 +94,6 @@ class AddTokenView(View):
             }})
         else:
             return JsonResponse({"code": 1002, "message": "添加失败!"})
-
-
 
 
 class EditTokenView(View):
