@@ -6,7 +6,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~
 
     使用search rule在github上进行第一次初步搜索
-    todo: 改成协程
+    todo: 改成GQL
 
     :author:    lightless <root@lightless.me>
     :homepage:  None
@@ -24,7 +24,7 @@ import requests
 from django.conf import settings
 
 from geye.database.models import GeyeTokenModel
-from geye.utils.datatype import PriorityTask
+from geye.utils.datatype import PriorityTask, AttribDict
 from .base import MultiThreadEngine
 from geye.utils.log import logger
 
@@ -82,12 +82,12 @@ class SearchEngine(MultiThreadEngine):
             curl -H "Authorization: token OAUTH-TOKEN" https://api.github.com
         从数据库中获取一个剩余次数最大的token
         """
-        token = GeyeTokenModel.objects.filter(is_deleted=0, status=1).order_by("-remain_limit").first()
+        token: GeyeTokenModel = GeyeTokenModel.objects.filter(is_deleted=0, status=1).order_by("-remain_limit").first()
         if not token:
             return None
         else:
             return {
-                "Authorization": "token {}".format(token),
+                "Authorization": "token {}".format(token.token),
                 "Accept": "application/vnd.github.v3.text-match+json",
             }
 
@@ -99,7 +99,7 @@ class SearchEngine(MultiThreadEngine):
             "page": page_num if page_num else 1
         }
 
-    def make_request(self, header, data) -> requests.Response:
+    def make_request(self, header, data) -> Optional[requests.Response]:
         """
         发出搜索请求
         :param header: 请求的header，包括token等信息
@@ -110,8 +110,16 @@ class SearchEngine(MultiThreadEngine):
         # 获取代理设置信息
         proxies = random.choice(self.all_proxies) if self.use_proxies else None
 
-        while True:
+        # 请求计数
+        # todo：先写死到代码里，计划移植到配置中
+        request_cnt = 0
+
+        while self.status == self.EngineStatus.RUNNING:
             try:
+                request_cnt += 1
+                if request_cnt == 5:
+                    logger.warning("请求超出最大次数!")
+                    break
                 response = requests.get(
                     self.search_api_url, params=data, headers=header, timeout=12, proxies=proxies
                 )
@@ -121,6 +129,46 @@ class SearchEngine(MultiThreadEngine):
                 logger.error("Try re-request after 5s.")
                 self.ev.wait(5)
                 continue
+
+        return None
+
+    def _request_page(self, request_header, request_data) -> Optional[requests.Response]:
+        """
+        请求每一页搜索结果
+        :param request_header:
+        :param request_data:
+        :return:
+        """
+        logger.debug("request_data: {} || request_header: {}".format(request_data, request_header))
+        api_limit_cnt = 0
+
+        while self.status == self.EngineStatus.RUNNING:
+            # make_request会循环请求5次，如果超过该次数还请求失败，则会返回None
+            response: Optional[requests.Response] = self.make_request(request_header, request_data)
+
+            # 请求超过最大次数、收到结束signal等情况，直接返回None
+            if response is None:
+                return None
+
+            # 收到了正常的response，解析status_code
+            status_code = response.status_code
+            logger.debug("status_code: {} || response header: {}".format(response.status_code, response.headers))
+            if status_code == 401:
+                # token有问题，这个情况下不需要再次请求了，直接返回None
+                logger.error("401 - Bad credentials, see: https://developer.github.com/v3")
+                return None
+            elif status_code == 403:
+                # 触发了频率限制，这个时候需要wait 60s后再次请求
+                # 限制重试5次，如果都请求失败了，直接返回None
+                api_limit_cnt += 1
+                if api_limit_cnt >= 5:
+                    return None
+                logger.error("403 - API rate limit exceeded. Wait 60s and will retry...")
+                self.ev.wait(60)
+                continue
+            else:
+                # 正常情况，返回response
+                return response
 
     def parse_response(self, response: requests.Response, srid, rule_name) -> dict:
         """
@@ -222,20 +270,14 @@ class SearchEngine(MultiThreadEngine):
                     logger.error("No available token found. Jumping search operator.")
                     break
 
-                logger.debug("Fetch data: {}, header: {}".format(request_data, request_header))
-
-                # 发起请求
-                response: requests.Response = self.make_request(request_header, request_data)
-                while response.status_code != 200:
-                    # 触发了频率限制，等60s重新请求当前page
-                    # todo: 换个token请求
-                    # todo: 增加错误次数限制，防止无限制请求
-                    logger.error("Trigger GITHUB abusing limit. Try re-request after 60s. "
-                                 "request data: {}, request header: {}".format(request_data, request_header))
-                    self.ev.wait(60)
-                    logger.debug("After 60s, try re-request to bypass abusing limit.")
-                    response: requests.Response = self.make_request(request_header, request_data)
-
+                result = self._request_page(request_header, request_data)
+                # 如果response为None，说明收到了结束信号，直接break
+                if result is None:
+                    break
+                else:
+                    response = result
+                logger.debug("response.text: {}".format(response.text))
+                # logger.debug("response header: {}".format(response.headers))
                 # 正常内容 开始解析内容
                 # return_val = {
                 #     "filter_tasks": [],
@@ -248,8 +290,8 @@ class SearchEngine(MultiThreadEngine):
                     continue
 
                 # 将生成的filter_task放入filter队列
-                for task in results["filter_tasks"]:
-                    self.push_to_queue(task_priority, task)
+                # for task in results["filter_tasks"]:
+                #     self.push_to_queue(task_priority, task)
 
                 # 根据has_next_page字段决定是否请求下一页
                 if not results["has_next_page"]:
