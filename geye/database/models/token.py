@@ -64,13 +64,13 @@ class TokenManager(models.Manager):
         :return:
         """
         with transaction.atomic():
-            obj = self.select_for_update().filter(is_deleted=0, id=params.token_id).first()
+            obj = self.select_for_update().filter(is_deleted=0, id=params["id"]).first()
             if not obj:
                 return None
             else:
                 obj.token_name = params["tokenName"]
                 obj.token = params["tokenContent"]
-                obj.remain_limit = params["remainLimit"]
+                # obj.remain_limit = params["remainLimit"]
                 obj.status = params["status"]
                 obj.save()
                 return obj

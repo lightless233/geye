@@ -102,7 +102,33 @@ class EditTokenView(View):
     """
     @staticmethod
     def post(request):
-        pass
+        logger.debug("POST: {}".format(request.body))
+
+        result = RequestValidator.check_params(
+            request, check_empty=True,
+            check_params=["id", "tokenName", "tokenContent", "status"]
+        )
+        if result.has_error:
+            logger.error("error: {}".format(result.error_message))
+            return JsonResponse({"code": 1004, "message": result.error_message})
+
+        args = result.params
+
+        token_id = args.get("id", None)
+        if not token_id or not GeyeTokenModel.instance.is_exist(token_id):
+            return JsonResponse({"code": 1004, "message": "token id不存在!"})
+
+        obj = GeyeTokenModel.instance.update_token(args)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "更新成功!", "data": {
+                "id": obj.id,
+                "tokenName": obj.token_name,
+                "tokenContent": obj.token,
+                "status": obj.status,
+                "remainLimit": obj.remain_limit,
+            }})
+        else:
+            return JsonResponse({"code": 1002, "message": "更新失败!"})
 
 
 class UpdateStatus(View):
@@ -111,7 +137,15 @@ class UpdateStatus(View):
     """
     @staticmethod
     def post(request):
-        pass
+        token_id = json.loads(request.body).get("id", None)
+        if not token_id or not GeyeTokenModel.instance.is_exist(token_id):
+            return JsonResponse({"code": 1004, "message": "token id不存在!"})
+
+        obj = GeyeTokenModel.instance.change_status(token_id)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "切换成功!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "切换失败!"})
 
 
 class TokenDetailsView(View):
@@ -120,4 +154,12 @@ class TokenDetailsView(View):
     """
     @staticmethod
     def get(request):
-        pass
+        token_id = request.GET.get("id", None)
+        if not token_id or not GeyeTokenModel.instance.is_exist(token_id):
+            return JsonResponse({"code": 1004, "message": "token id不存在!"})
+
+        obj = GeyeTokenModel.instance.get_details(token_id)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "获取成功!", "data": obj})
+        else:
+            return JsonResponse({"code": 1002, "message": "获取失败!"})

@@ -180,3 +180,4 @@ pip-selfcheck.json
 ### PROJECT'S FILE
 geye/config/dev.py
 .idea
+geye-fe/src/config/index.js
