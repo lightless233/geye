@@ -301,8 +301,8 @@ class SearchEngine(MultiThreadEngine):
                     continue
 
                 # 将生成的filter_task放入filter队列
-                # for task in results["filter_tasks"]:
-                #     self.push_to_queue(task_priority, task)
+                for task in results["filter_tasks"]:
+                    self.push_to_queue(task_priority, task)
 
                 # 根据has_next_page字段决定是否请求下一页
                 if not results["has_next_page"]:
