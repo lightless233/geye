@@ -16,6 +16,7 @@ from django.urls import path
 
 from .controller.rule import search, filter, globalFilter
 from .controller.token import token
+from .controller.handleCenter import searchResults
 
 
 # 总的路由
@@ -51,4 +52,7 @@ urlpatterns = [
     path("v1/token/delete", token.DeleteTokenView.as_view()),
     path("v1/token/change_status", token.UpdateStatus.as_view()),
     path("v1/token/detail", token.TokenDetailsView.as_view()),
+
+    # search handle center 相关的路由
+    path("v1/results/all", searchResults.AllSearchResults.as_view()),
 ]

@@ -74,6 +74,13 @@ class FilterRuleManager(models.Manager):
     def all_global_filter_rule(self):
         return self.filter(is_deleted=0, parent_id=0).all()
 
+    def get_name_by_pk(self, pk):
+        obj = self.filter(is_deleted=0, id=pk).first()
+        if not obj:
+            return ""
+        else:
+            return obj.name
+
 
 class GeyeFilterRuleModel(GeyeBaseModel):
     """

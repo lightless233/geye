@@ -82,6 +82,18 @@ class SearchRuleManager(models.Manager):
         else:
             return None
 
+    def get_name_by_pk(self, pk):
+        """
+        根据search rule id获取对应的规则名称
+        :param pk:
+        :return:
+        """
+        obj = self.filter(is_deleted=0, id=pk).first()
+        if not obj:
+            return ""
+        else:
+            return obj.name
+
 
 class GeyeSearchRuleModel(GeyeBaseModel):
     """
