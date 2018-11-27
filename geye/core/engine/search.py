@@ -82,13 +82,17 @@ class SearchEngine(MultiThreadEngine):
             curl -H "Authorization: token OAUTH-TOKEN" https://api.github.com
         从数据库中获取一个剩余次数最大的token
         """
-        token: GeyeTokenModel = GeyeTokenModel.objects.filter(is_deleted=0, status=1).order_by("-remain_limit").first()
-        if not token:
+        row: GeyeTokenModel = GeyeTokenModel.objects.filter(is_deleted=0, status=1).order_by("-remain_limit").first()
+        if not row:
             return None
         else:
-            return {
-                "Authorization": "token {}".format(token.token),
+            req_header = {
+                "Authorization": "token {}".format(row.token),
                 "Accept": "application/vnd.github.v3.text-match+json",
+            }
+            return {
+                "token_id": row.id,
+                "header": req_header
             }
 
     def build_request_data(self, rule_content, page_num) -> dict:
@@ -142,9 +146,12 @@ class SearchEngine(MultiThreadEngine):
         logger.debug("request_data: {} || request_header: {}".format(request_data, request_header))
         api_limit_cnt = 0
 
+        token_id = request_header["token_id"]
+        header = request_header["header"]
+
         while self.status == self.EngineStatus.RUNNING:
             # make_request会循环请求5次，如果超过该次数还请求失败，则会返回None
-            response: Optional[requests.Response] = self.make_request(request_header, request_data)
+            response: Optional[requests.Response] = self.make_request(header, request_data)
 
             # 请求超过最大次数、收到结束signal等情况，直接返回None
             if response is None:
@@ -156,10 +163,12 @@ class SearchEngine(MultiThreadEngine):
             if status_code == 401:
                 # token有问题，这个情况下不需要再次请求了，直接返回None
                 logger.error("401 - Bad credentials, see: https://developer.github.com/v3")
+                GeyeTokenModel.instance.filter(is_deleted=0, pk=token_id).update(remain_limit=-1)
                 return None
             elif status_code == 403:
                 # 触发了频率限制，这个时候需要wait 60s后再次请求
                 # 限制重试5次，如果都请求失败了，直接返回None
+                GeyeTokenModel.instance.filter(is_deleted=0, pk=token_id).update(remain_limit=0)
                 api_limit_cnt += 1
                 if api_limit_cnt >= 5:
                     return None
@@ -168,6 +177,8 @@ class SearchEngine(MultiThreadEngine):
                 continue
             else:
                 # 正常情况，返回response
+                token_remain_cnt = int(response.headers.get("X-RateLimit-Remaining", 0))
+                GeyeTokenModel.instance.filter(is_deleted=0, pk=token_id).update(remain_limit=token_remain_cnt)
                 return response
 
     def parse_response(self, response: requests.Response, srid, rule_name) -> dict:
