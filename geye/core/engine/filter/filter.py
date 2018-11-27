@@ -271,6 +271,7 @@ class FilterEngine(MultiThreadEngine):
                             "filter_rule_name": _rule.name
                         })
                         self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                        break
                     elif _action == 4:
                         logger.debug("Action: Confirm -> save -> end filter.")
                         save_task = (task_priority, {
@@ -282,6 +283,7 @@ class FilterEngine(MultiThreadEngine):
                             "filter_rule_name": _rule.name
                         })
                         self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                        break
                     elif _action == 5:
                         logger.debug("Action: To-be-confirmed -> save -> end filter.")
                         save_task = (task_priority, {
@@ -293,6 +295,7 @@ class FilterEngine(MultiThreadEngine):
                             "filter_rule_name": _rule.name
                         })
                         self.put_task_to_queue(save_task, target_queue=self.save_task_queue)
+                        break
                     else:
                         logger.error("Unknown action value: {}".format(_action))
                 else:

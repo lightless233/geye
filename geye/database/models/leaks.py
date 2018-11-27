@@ -81,5 +81,5 @@ class GeyeLeaksModel(GeyeBaseModel):
     status = models.PositiveSmallIntegerField(default=1)
     pushed = models.BooleanField(default=False)
 
-    object = models.Manager()
+    objects = models.Manager()
     instance = LeaksManager()
