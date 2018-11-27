@@ -99,8 +99,8 @@ class FilterEngine(MultiThreadEngine):
             response = requests.get(raw_code_url, timeout=15, proxies=proxies)
             result["code"] = response.text
             result["success"] = True
-        except requests.RequestException:
-            logger.error("Error while get raw code. Will re-put filter task to queue. URL: {}".format(raw_code_url))
+        except requests.RequestException as e:
+            logger.error("Error while get raw code. Will re-put filter task to queue. URL: {}. error: {}".format(raw_code_url, e))
 
         return result
 
@@ -185,6 +185,7 @@ class FilterEngine(MultiThreadEngine):
             rv["error"] = filter_result["error"]
             rv["found"] = filter_result["found"]
             rv["code"] = filter_result["code"]
+            # logger.debug("rv: {}".format(rv))
             return rv
         else:
             logger.error("unknown filter engine, rule_engine: '{}'".format(rule.rule_engine))

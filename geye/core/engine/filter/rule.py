@@ -181,10 +181,12 @@ class RuleEngine(object):
             "found": False,
             "code": ""
         }
+        # logger.debug("rule_content: {}, filter_content: {}".format(rule_content, filter_content))
         filter_content_array = RuleEngine.convert_code_to_list(filter_content)
+        # logger.debug("filter_content_array: {}".format(filter_content_array))
         for line_no, line in enumerate(filter_content_array):
             if rule_content in line:
-                result["has_found"] = True
+                result["found"] = True
                 # 取前后各5行代码
                 begin_no, end_no, code_array = RuleEngine.get_neighbor_code(line_no, filter_content_array, 5)
                 result["code"] = "\n".join(code_array)
