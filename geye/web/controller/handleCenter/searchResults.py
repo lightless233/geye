@@ -5,12 +5,16 @@
     geye.web.controller.handlerCenter.searchResults
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    handle center相关的路由
+    只有search结果的部分
 
     :author:    lightless <root@lightless.me>
     :homepage:  None
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+import json
+
 from django.http import JsonResponse
 from django.views import View
 
@@ -53,4 +57,17 @@ class AllSearchResults(View):
 
         return JsonResponse({"code": 1001, "message": "获取成功!", "data": data})
 
+
+class IgnoreSearchResult(View):
+    @staticmethod
+    def post(request):
+        leak_id = json.loads(request.body).get("id", None)
+        if not leak_id or not GeyeLeaksModel.instance.is_exist_by_pk(leak_id):
+            return JsonResponse({"code": 1004, "message": "leak id不存在!"})
+
+        obj = GeyeLeaksModel.instance.filter(pk=leak_id).update(status=3)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "已设为误报!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "设为误报失败!"})
 

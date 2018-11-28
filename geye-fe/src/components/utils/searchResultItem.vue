@@ -48,6 +48,14 @@
     methods: {
       handleRawCode: function () {
         window.open(this.item.full_code_url);
+      },
+
+      handleIgnore: function () {
+
+      },
+
+      handleConfirm: function () {
+
       }
     }
   }

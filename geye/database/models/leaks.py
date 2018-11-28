@@ -35,6 +35,9 @@ class LeaksManager(models.Manager):
         else:
             return False
 
+    def is_exist_by_pk(self, pk):
+        return True if self.filter(is_deleted=0, pk=pk).first() else False
+
 
 class GeyeLeaksModel(GeyeBaseModel):
     """
