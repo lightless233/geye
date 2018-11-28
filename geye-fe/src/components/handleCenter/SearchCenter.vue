@@ -1,6 +1,6 @@
 <template>
   <div class="main-div" v-loading="loading">
-    <search-result-item :item=item></search-result-item>
+    <search-result-item v-for="item in items" :item="item"></search-result-item>
   </div>
 </template>
 <script>
@@ -35,10 +35,7 @@
     data() {
       return {
         loading: false,
-        items: {
-          title: "aaa",
-          code: "aaaa\nbbbb\nccc"
-        }
+        items: [],
       }
     },
   }

@@ -63,6 +63,7 @@ class GeyeLeaksModel(GeyeBaseModel):
         这个信息当前的状态，1-待处理，2-已确认是泄露，3-误报
     pushed
         预留字段，是否已经推送到其他系统，1-已推送到其他系统，0-未推送到其他系统
+
     """
 
     class Meta:

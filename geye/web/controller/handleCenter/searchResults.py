@@ -24,6 +24,7 @@ class AllSearchResults(View):
 
     def get(self, request):
         page = request.GET.get("page", 1)
+        page = int(page)
         start_id = (page-1) * self.PAGE_SIZE
         end_id = start_id + self.PAGE_SIZE
         rows = GeyeLeaksModel.instance.filter(is_deleted=0).order_by("-created_time")[start_id:end_id]
@@ -47,6 +48,7 @@ class AllSearchResults(View):
                 "pushed": row.pushed,
                 "searchRuleName": search_rule_name,
                 "filterRuleName": filter_rule_name,
+                "created_time": row.created_time.strftime("%Y-%m-%d %H:%M:%S"),
             })
 
         return JsonResponse({"code": 1001, "message": "获取成功!", "data": data})
