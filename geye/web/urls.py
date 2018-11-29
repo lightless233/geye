@@ -55,4 +55,6 @@ urlpatterns = [
 
     # search handle center 相关的路由
     path("v1/results/all", searchResults.AllSearchResults.as_view()),
+    path("v1/results/ignore", searchResults.IgnoreSearchResult.as_view()),
+    path("v1/results/confirm", searchResults.ConfirmSearchResult.as_view()),
 ]

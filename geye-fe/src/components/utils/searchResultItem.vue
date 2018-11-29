@@ -1,9 +1,10 @@
 <template>
-  <item-card class="box-card" shadow="hover">
+  <item-card class="box-card" shadow="hover" v-show="hasShow">
     <div slot="header" class="clearfix title">
       <div style="margin-bottom: 10px">
-        <span>[{{item.author}}/{{item.repoName}}] {{item.path}}</span>
+        <span @click="handleClickTitle" class="url">[{{item.author}}/{{item.repoName}}] {{item.path}}</span>
       </div>
+      <el-tag size="mini" type="info" class="tag">ID: {{item.id}}</el-tag>
       <el-tag size="mini" type="info" class="tag">{{item.searchRuleName}} - {{item.filterRuleName}}</el-tag>
       <el-tag size="mini" type="info" class="tag">发现时间: {{item.created_time}}</el-tag>
       <el-tag size="mini" type="info" class="tag">{{item.sha}}</el-tag>
@@ -15,9 +16,9 @@
       <el-row style="padding: 20px">
         <el-col :span="12">
           <el-button-group>
-            <el-button size="small" type="success" style="width: 100px">确 认</el-button>
+            <el-button size="small" type="success" style="width: 100px" @click="handleConfirm">确 认</el-button>
             <el-button size="small" type="primary" style="width: 100px" @click="handleRawCode">详 情</el-button>
-            <el-button size="small" type="danger" style="width: 100px">忽 略</el-button>
+            <el-button size="small" type="danger" style="width: 100px" @click="handleIgnore">忽 略</el-button>
           </el-button-group>
         </el-col>
         <el-col :span="12" style="text-align: right">
@@ -37,6 +38,8 @@
 <script>
 
   import itemCard from "@/components/utils/ItemCard";
+  import searchResultsService from "@/services/handleCenter/searchCenter";
+  import ApiConstant from "@/utils/constant";
 
   export default {
     name: "searchResultItem",
@@ -45,17 +48,50 @@
     components: {
       "ItemCard": itemCard
     },
+    data() {
+      return {
+        hasShow: true,
+      }
+    },
     methods: {
       handleRawCode: function () {
         window.open(this.item.full_code_url);
       },
 
       handleIgnore: function () {
-
+        // console.log(this.item);
+        searchResultsService.ignore(this, {"id": this.item.id})
+          .then(resp => {
+            if (resp.data.code === 1001) {
+              this.hasShow = false;
+            } else {
+              this.$message.error(resp.data.message);
+            }
+          })
+          .catch(err => {
+            this.$message.error(ApiConstant.error_500);
+            console.log("error:", err);
+          });
       },
 
       handleConfirm: function () {
+        searchResultsService.confirm(this, {"id": this.item.id})
+          .then(resp => {
+            if (resp.data.code === 1001) {
+              this.hasShow = false;
+              this.$message.success("已确认信息泄露！")
+            } else {
+              this.$message.error(resp.data.message);
+            }
+          })
+          .catch(err => {
+            this.$message.error(ApiConstant.error_500);
+            console.log("error:", err);
+          });
+      },
 
+      handleClickTitle: function () {
+        window.open(this.item.url)
       }
     }
   }
@@ -70,5 +106,8 @@
   }
   .tag {
     margin-right: 5px;
+  }
+  .url {
+    cursor: pointer;
   }
 </style>

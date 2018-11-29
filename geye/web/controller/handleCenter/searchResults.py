@@ -31,13 +31,17 @@ class AllSearchResults(View):
         page = int(page)
         start_id = (page-1) * self.PAGE_SIZE
         end_id = start_id + self.PAGE_SIZE
-        rows = GeyeLeaksModel.instance.filter(is_deleted=0).order_by("-created_time")[start_id:end_id]
+        # 只返回待处理状态的
+        rows = GeyeLeaksModel.instance.filter(is_deleted=0, status=1).order_by("-created_time")[start_id:end_id]
 
         data = []
         for row in rows:
             search_rule_name = GeyeSearchRuleModel.instance.get_name_by_pk(row.srid)
             filter_rule_name = GeyeFilterRuleModel.instance.get_name_by_pk(row.frid)
+            if not filter_rule_name:
+                filter_rule_name = "规则已删除"
             data.append({
+                "id": row.id,
                 "repoName": row.repo_name,
                 "author": row.author,
                 "path": row.path,
@@ -71,3 +75,16 @@ class IgnoreSearchResult(View):
         else:
             return JsonResponse({"code": 1002, "message": "设为误报失败!"})
 
+
+class ConfirmSearchResult(View):
+    @staticmethod
+    def post(request):
+        leak_id = json.loads(request.body).get("id", None)
+        if not leak_id or not GeyeLeaksModel.instance.is_exist_by_pk(leak_id):
+            return JsonResponse({"code": 1004, "message": "leak id不存在!"})
+
+        obj = GeyeLeaksModel.instance.filter(pk=leak_id).update(status=2)
+        if obj:
+            return JsonResponse({"code": 1001, "message": "已确认为泄露!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "设为泄露失败!"})
