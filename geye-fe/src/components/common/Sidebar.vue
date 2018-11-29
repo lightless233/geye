@@ -83,7 +83,12 @@
             icon: "key",
             index: "/token",
             title: "Token管理"
-          }
+          },
+          {
+            icon: "money-check-alt",
+            index: "/leaks",
+            title: "泄露信息管理",
+          },
         ]
       }
     },

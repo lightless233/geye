@@ -5,10 +5,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 
 // font awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faTachometerAlt, faList, faPaperPlane, faBars, faKey } from '@fortawesome/free-solid-svg-icons'
+import { faTachometerAlt, faList, faPaperPlane, faBars, faKey, faMoneyCheckAlt } from '@fortawesome/free-solid-svg-icons'
 import {faCircle} from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-library.add(faTachometerAlt, faList, faPaperPlane, faCircle, faBars, faKey);
+library.add(faTachometerAlt, faList, faPaperPlane, faCircle, faBars, faKey, faMoneyCheckAlt);
 
 
 // axios

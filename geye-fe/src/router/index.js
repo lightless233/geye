@@ -53,6 +53,12 @@ const routerConf = [
   },
 
   {
+    path: "/leaks",
+    component: resolve => require(["@/components/leaks.vue"], resolve),
+    name: "leaks",
+  },
+
+  {
     path: "/*",
     component: resolve => require(["../components/404.vue"], resolve),
   }
