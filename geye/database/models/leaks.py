@@ -38,6 +38,14 @@ class LeaksManager(models.Manager):
     def is_exist_by_pk(self, pk):
         return True if self.filter(is_deleted=0, pk=pk).first() else False
 
+    def fake_delete(self, pk):
+        """
+        根据 id 删除一条leak记录
+        :param pk:
+        :return:
+        """
+        return self.filter(is_deleted=0, pk=pk).update(is_deleted=1)
+
 
 class GeyeLeaksModel(GeyeBaseModel):
     """
