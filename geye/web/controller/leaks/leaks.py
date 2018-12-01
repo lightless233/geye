@@ -25,10 +25,14 @@ class AllLeaksView(View):
 
     def get(self, request):
         page = request.GET.get("page", 1)
-        status = request.GET.get("status", "0")
+        status = request.GET.get("status", None)
+        if not status:
+            return JsonResponse({"code": 1005, "message": "参数错误!"})
 
         page = int(page)
-        status = status.split(",") if int(status) != 0 else [1, 2, 3]
+        status = status.split(",")
+        if not status:
+            status = [1, 2, 3]
 
         if not page or not status:
             return JsonResponse({"code": 1004, "message": "参数错误!"})
@@ -36,9 +40,12 @@ class AllLeaksView(View):
         start_id = (page - 1) * self.PAGE_SIZE
         end_id = start_id + self.PAGE_SIZE
 
-        rows = GeyeLeaksModel.instance.filter(
+        sql = GeyeLeaksModel.instance.filter(
             is_deleted=0, status__in=status
-        ).order_by("-created_time")[start_id:end_id]
+        ).order_by("-created_time")
+
+        rows = sql[start_id:end_id]
+        total_count = sql.count()
 
         data = []
         for row in rows:
@@ -65,7 +72,7 @@ class AllLeaksView(View):
                 "created_time": row.created_time.strftime("%Y-%m-%d %H:%M:%S"),
             })
 
-        return JsonResponse({"code": 1001, "message": "获取成功!", "data": data})
+        return JsonResponse({"code": 1001, "message": "获取成功!", "data": data, "total_count": total_count})
 
 
 class DeleteLeakView(View):
@@ -86,7 +93,12 @@ class DeleteLeakView(View):
 
 
 class ChangeStatusLeakView(View):
-
+    """
+    修改leaks的状态
+    request params:
+        - action
+        - id
+    """
     ACTIONS = ["ignore", "confirm"]
 
     def post(self, request):

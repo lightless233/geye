@@ -20,7 +20,7 @@ export default {
   },
 
   confirm(ctx, data) {
-    return ctx.axios.post(API_LIST.ignoreResult, data);
+    return ctx.axios.post(API_LIST.confirmResult, data);
   },
 
 }

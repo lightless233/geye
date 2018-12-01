@@ -78,7 +78,7 @@
         searchResultsService.confirm(this, {"id": this.item.id})
           .then(resp => {
             if (resp.data.code === 1001) {
-              this.hasShow = false;
+              // this.hasShow = false;
               this.$message.success("已确认信息泄露！")
             } else {
               this.$message.error(resp.data.message);

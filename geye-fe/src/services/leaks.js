@@ -6,6 +6,7 @@ const BASE_API = config.BASE_API;
 const API_LIST = {
   getLeaks: BASE_API + "/api/v1/leaks/all",
   deleteLeak: BASE_API + "/api/v1/leaks/delete",
+  changeStatusLeak: BASE_API + "/api/v1/leaks/change_status",
 };
 
 export default {
@@ -22,6 +23,14 @@ export default {
       id: id
     };
     return ctx.axios.post(API_LIST.deleteLeak, data);
+  },
+
+  changeStatusLeak(ctx, action ,id) {
+    let data = {
+      id: id,
+      action: action
+    };
+    return ctx.axios.post(API_LIST.changeStatusLeak, data);
   }
 
 }

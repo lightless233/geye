@@ -62,4 +62,5 @@ urlpatterns = [
     # leaks 相关的路由
     path("v1/leaks/all", leaks.AllLeaksView.as_view()),
     path("v1/leaks/delete", leaks.DeleteLeakView.as_view()),
+    path("v1/leaks/change_status", leaks.ChangeStatusLeakView.as_view()),
 ]
