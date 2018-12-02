@@ -164,7 +164,7 @@ class TokenDetailsView(View):
 
         obj = GeyeTokenModel.instance.get_details(token_id)
         if obj:
-            obj["token"] = mask_token(obj["token"])
+            obj["tokenContent"] = mask_token(obj["tokenContent"])
             return JsonResponse({"code": 1001, "message": "获取成功!", "data": obj})
         else:
             return JsonResponse({"code": 1002, "message": "获取失败!"})
