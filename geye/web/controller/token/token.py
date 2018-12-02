@@ -22,6 +22,10 @@ from geye.utils.log import logger
 from geye.utils.validator import RequestValidator
 
 
+def mask_token(token):
+    return token[:8] + "*" * 24
+
+
 class TokensView(View):
     """
     获取所有token信息
@@ -35,7 +39,7 @@ class TokensView(View):
             data.append({
                 "id": row.id,
                 "tokenName": row.token_name,
-                "tokenContent": row.token,
+                "tokenContent": mask_token(row.token),
                 "status": row.status,
                 "remainLimit": row.remain_limit
             })
@@ -123,7 +127,7 @@ class EditTokenView(View):
             return JsonResponse({"code": 1001, "message": "更新成功!", "data": {
                 "id": obj.id,
                 "tokenName": obj.token_name,
-                "tokenContent": obj.token,
+                "tokenContent": mask_token(obj.token),
                 "status": obj.status,
                 "remainLimit": obj.remain_limit,
             }})
@@ -160,6 +164,7 @@ class TokenDetailsView(View):
 
         obj = GeyeTokenModel.instance.get_details(token_id)
         if obj:
+            obj["tokenContent"] = mask_token(obj["tokenContent"])
             return JsonResponse({"code": 1001, "message": "获取成功!", "data": obj})
         else:
             return JsonResponse({"code": 1002, "message": "获取失败!"})

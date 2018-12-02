@@ -69,7 +69,9 @@ class TokenManager(models.Manager):
                 return None
             else:
                 obj.token_name = params["tokenName"]
-                obj.token = params["tokenContent"]
+                # 如果传递过来的token中有星号，那么不对token字段进行更新
+                if "*" not in params["tokenContent"]:
+                    obj.token = params["tokenContent"]
                 # obj.remain_limit = params["remainLimit"]
                 obj.status = params["status"]
                 obj.save()

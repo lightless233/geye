@@ -48,6 +48,10 @@ DB_PORT = ""
 # CSRF_COOKIE_DOMAIN = "localhost:8080"
 # CSRF_USE_SESSIONS = True
 CSRF_COOKIE_SAMESITE = None
+ALLOWED_CORS = [
+    "localhost",
+    "127.0.0.1"
+]
 
 ##########
 # Queue settings
