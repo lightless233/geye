@@ -15,6 +15,7 @@
 
 from urllib.parse import urlparse
 
+from django.conf import settings
 from django.http import HttpResponseForbidden
 
 from geye.utils.log import logger
@@ -26,10 +27,7 @@ class CORSMiddleware:
         super(CORSMiddleware, self).__init__()
         self.get_response = get_response
 
-        self.allowed_origins = [
-            "localhost",
-            "127.0.0.1",
-        ]
+        self.allowed_origins = settings.ALLOWED_CORS
 
     def __call__(self, request):
         response = self.get_response(request)
