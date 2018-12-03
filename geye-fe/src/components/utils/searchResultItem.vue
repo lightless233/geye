@@ -10,7 +10,7 @@
       <el-tag size="mini" type="info" class="tag">{{item.sha}}</el-tag>
     </div>
     <div slot="content">
-      <pre>{{item.code}}</pre>
+      <pre style="overflow-y: auto">{{item.code}}</pre>
     </div>
     <div slot="footer">
       <el-row style="padding: 20px">
