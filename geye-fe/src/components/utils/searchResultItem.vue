@@ -25,8 +25,10 @@
           <el-dropdown trigger="click">
             <el-button size="small" type="default">更多操作<i class="el-icon-arrow-down el-icon--right"></i></el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>推送到其他系统</el-dropdown-item>
+              <el-dropdown-item>规则转化</el-dropdown-item>
+              <el-dropdown-item>批量处理</el-dropdown-item>
               <el-dropdown-item>clone并上传到OSS保存</el-dropdown-item>
+              <el-dropdown-item>推送到其他系统</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </el-col>
