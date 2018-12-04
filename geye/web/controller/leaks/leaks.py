@@ -124,3 +124,34 @@ class ChangeStatusLeakView(View):
                 return JsonResponse({"code": 1002, "message": "修改失败!"})
 
         return JsonResponse({"code": 1003, "message": "error action!"})
+
+
+class BatchChangeStatusLeakView(View):
+    """
+    批量修改leaks的状态
+    request params:
+        :action:
+        :ids:
+    """
+    ACTIONS = ["ignore", "confirm"]
+
+    def post(self, request):
+        request_params = json.loads(request.body)
+        action = request_params.get("action", None)
+        leak_id = request_params.get("ids", list())
+
+        if not action or action not in self.ACTIONS:
+            return JsonResponse({"code": 1004, "message": "action不存在!"})
+        if not isinstance(leak_id, list) or not len(leak_id):
+            return JsonResponse({"code": 1004, "message": "id不存在!"})
+
+        if action == "confirm":
+            new_status = LeaksStatusConstant.CONFIRM
+        elif action == "ignore":
+            new_status = LeaksStatusConstant.IGNORE
+
+        result = GeyeLeaksModel.instance.filter(is_deleted=0, pk__in=leak_id).update(status=new_status)
+        if result:
+            return JsonResponse({"code": 1001, "message": "更新成功!"})
+        else:
+            return JsonResponse({"code": 1002, "message": "更新失败!"})

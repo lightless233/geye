@@ -63,4 +63,5 @@ urlpatterns = [
     path("v1/leaks/all", leaks.AllLeaksView.as_view()),
     path("v1/leaks/delete", leaks.DeleteLeakView.as_view()),
     path("v1/leaks/change_status", leaks.ChangeStatusLeakView.as_view()),
+    path("v1/leaks/batch_change_status", leaks.BatchChangeStatusLeakView.as_view()),
 ]
