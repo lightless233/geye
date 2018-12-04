@@ -21,7 +21,7 @@
                                 <a class="url" :href="data.row.full_code_url">点我查看</a>
                             </el-form-item>
                             <el-form-item label="代码段">
-                                <pre style="line-height: normal; padding-left: 90px">{{data.row.code}}</pre>
+                                <pre style="line-height: normal; padding-left: 90px; overflow-y: auto">{{data.row.code}}</pre>
                             </el-form-item>
                         </el-form>
                     </template>
