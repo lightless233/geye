@@ -13,7 +13,7 @@
 </template>
 <script>
 
-  import searchResultItem from "@/components/utils/searchResultItem"
+  import searchResultItem from "@/components/handleCenter/utils/searchResultItem"
   import resultsService from "@/services/handleCenter/searchCenter"
   import ApiConstant from "@/utils/constant"
 

@@ -7,6 +7,7 @@ const API_LIST = {
   getLeaks: BASE_API + "/api/v1/leaks/all",
   deleteLeak: BASE_API + "/api/v1/leaks/delete",
   changeStatusLeak: BASE_API + "/api/v1/leaks/change_status",
+  batchChangeStatus: BASE_API + "/api/v1/leaks/batch_change_status",
 };
 
 export default {
@@ -31,6 +32,14 @@ export default {
       action: action
     };
     return ctx.axios.post(API_LIST.changeStatusLeak, data);
+  },
+
+  batchChangeStatusLeak(ctx, action, ids) {
+    let data = {
+      action: action,
+      ids: ids,
+    };
+    return ctx.axios.post(API_LIST.batchChangeStatus, data);
   }
 
 }
