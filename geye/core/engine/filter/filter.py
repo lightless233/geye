@@ -105,6 +105,12 @@ class FilterEngine(MultiThreadEngine):
         return result
 
     def put_task_to_queue(self, task, target_queue: queue.PriorityQueue = None):
+        """
+        把任务放到队列中去
+        :param task: 待处理的任务
+        :param target_queue: 待放入的队列
+        :return:
+        """
         if not target_queue:
             target_queue = self.filter_task_queue
         while self.status == self.EngineStatus.RUNNING:
@@ -117,6 +123,13 @@ class FilterEngine(MultiThreadEngine):
 
     @staticmethod
     def __get_content_by_position(position, task, raw_code):
+        """
+        根据position id获取对应位置的内容
+        :param position:
+        :param task:
+        :param raw_code:
+        :return:
+        """
         position = int(position)
         result = {
             "success": True,
