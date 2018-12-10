@@ -87,7 +87,8 @@
           .then(resp => {
             if (resp.data.code === 1001) {
               // this.hasShow = false;
-              this.$message.success("已确认信息泄露！")
+              this.$message.success("已确认信息泄露！");
+              this.hasShow = false;
             } else {
               this.$message.error(resp.data.message);
             }
