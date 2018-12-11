@@ -140,23 +140,48 @@ class RuleEngine(object):
             result_queue = multiprocessing.Queue()
             p = Process(target=RuleEngine._regex_inner_engine, args=(rule_content, filter_content, result_queue, ))
             p.start()
+
+            # 等待60秒来进行正则匹配
+            p.join(60)
+            if p.is_alive():
+                logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
+                p.terminate()
+                p.join()
+
+                # 主动释放queue，防止内存泄露
+                del result_queue
+                filter_result["error"] = True
+                return filter_result
+
+            # 获取queue中的数据
             try:
-                p.join(60)
                 _result = result_queue.get_nowait()
                 filter_result["found"] = _result["found"]
                 filter_result["code"] = _result["code"]
                 return filter_result
-            except multiprocessing.TimeoutError:
-                # 线程超时
-                logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
-                p.terminate()
-                filter_result["error"] = True
-                return filter_result
             except queue.Empty:
-                # 线程结束了，但是没获取到东西
+                # 进程结束了，但是没获取到东西
                 logger.error("Empty result get from queue! frid: {}".format(frid))
                 filter_result["error"] = True
                 return filter_result
+
+            # try:
+            #     p.join(60)
+            #     _result = result_queue.get_nowait()
+            #     filter_result["found"] = _result["found"]
+            #     filter_result["code"] = _result["code"]
+            #     return filter_result
+            # except multiprocessing.TimeoutError:
+            #     # 进程超时
+            #     logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
+            #     p.terminate()
+            #     filter_result["error"] = True
+            #     return filter_result
+            # except queue.Empty:
+            #     # 线程结束了，但是没获取到东西
+            #     logger.error("Empty result get from queue! frid: {}".format(frid))
+            #     filter_result["error"] = True
+            #     return filter_result
         elif settings.REGEX_ENGINE == "grep":
             # grep engine
             rule = shlex.quote(rule_content)
@@ -173,19 +198,38 @@ class RuleEngine(object):
     @staticmethod
     def string_filter(rule_content, filter_content) -> dict:
         """
-        普通的字符串in查找
-        先通过for迭代查找每一行，todo: 后面需要重构，不然会影响效率
+        普通的字符串查找，支持简单的Python表达式，按照行进行查找
+        :param rule_content:
+            规则内容
+            "password" in {{value}} and "token" not in {{value}}
+        :param filter_content: 待过滤的内容
+
+
         """
         result = {
             "error": False,
             "found": False,
             "code": ""
         }
+
+        # TODO: 这里存在代码执行的风险，先简单过滤，实际上并没有什么用
+        if "__class__" in rule_content or "__subclasses__" in rule_content:
+            logger.fatal("危险规则，禁止执行!")
+            return result
+
+        rule_content = rule_content.replace("{{content}}", "line")
+
         # logger.debug("rule_content: {}, filter_content: {}".format(rule_content, filter_content))
+        # eval_result = eval(rule_content, globals={"__builtins__": None}, locals={"filter_content": filter_content})
+        # if not eval_result:
+        #     # 没找到，直接返回result对象即可
+        #     return result
+
+        # 找到了，按照行来找上下文代码
         filter_content_array = RuleEngine.convert_code_to_list(filter_content)
         # logger.debug("filter_content_array: {}".format(filter_content_array))
         for line_no, line in enumerate(filter_content_array):
-            if rule_content in line:
+            if eval(rule_content, {"__builtins__": None}, {"line": line}):
                 result["found"] = True
                 # 取前后各5行代码
                 begin_no, end_no, code_array = RuleEngine.get_neighbor_code(line_no, filter_content_array, 5)
