@@ -140,23 +140,48 @@ class RuleEngine(object):
             result_queue = multiprocessing.Queue()
             p = Process(target=RuleEngine._regex_inner_engine, args=(rule_content, filter_content, result_queue, ))
             p.start()
+
+            # 等待60秒来进行正则匹配
+            p.join(60)
+            if p.is_alive():
+                logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
+                p.terminate()
+                p.join()
+
+                # 主动释放queue，防止内存泄露
+                del result_queue
+                filter_result["error"] = True
+                return filter_result
+
+            # 获取queue中的数据
             try:
-                p.join(60)
                 _result = result_queue.get_nowait()
                 filter_result["found"] = _result["found"]
                 filter_result["code"] = _result["code"]
                 return filter_result
-            except multiprocessing.TimeoutError:
-                # 线程超时
-                logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
-                p.terminate()
-                filter_result["error"] = True
-                return filter_result
             except queue.Empty:
-                # 线程结束了，但是没获取到东西
+                # 进程结束了，但是没获取到东西
                 logger.error("Empty result get from queue! frid: {}".format(frid))
                 filter_result["error"] = True
                 return filter_result
+
+            # try:
+            #     p.join(60)
+            #     _result = result_queue.get_nowait()
+            #     filter_result["found"] = _result["found"]
+            #     filter_result["code"] = _result["code"]
+            #     return filter_result
+            # except multiprocessing.TimeoutError:
+            #     # 进程超时
+            #     logger.error("[INNER REGEX] filter timeout! frid: {}".format(frid))
+            #     p.terminate()
+            #     filter_result["error"] = True
+            #     return filter_result
+            # except queue.Empty:
+            #     # 线程结束了，但是没获取到东西
+            #     logger.error("Empty result get from queue! frid: {}".format(frid))
+            #     filter_result["error"] = True
+            #     return filter_result
         elif settings.REGEX_ENGINE == "grep":
             # grep engine
             rule = shlex.quote(rule_content)
