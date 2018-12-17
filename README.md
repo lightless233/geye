@@ -10,6 +10,8 @@
 - 方便的管理界面，快速打标处理
 - 强大的规则系统，满足各种复杂搜索、过滤规则
 
+![](http://lightless-blog.oss-cn-shanghai.aliyuncs.com/github-monitor/geye.png)
+
 # 安装及快速开始
 ### 1. 部署需求
 - Python 3.6.0 及以上版本
