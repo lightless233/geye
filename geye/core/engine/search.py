@@ -24,7 +24,7 @@ import requests
 from django.conf import settings
 
 from geye.database.models import GeyeTokenModel
-from geye.utils.datatype import PriorityTask, AttribDict
+from geye.utils.datatype import PriorityTask
 from .base import MultiThreadEngine
 from geye.utils.log import logger
 
