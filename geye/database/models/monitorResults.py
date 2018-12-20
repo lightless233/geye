@@ -13,8 +13,6 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 
-import time
-
 from django.db import models
 
 from .base import GeyeBaseModel
@@ -24,7 +22,7 @@ class MonitorResultsManager(models.Manager):
     pass
 
 
-class MonitorResultsModel(GeyeBaseModel):
+class GeyeMonitorResultsModel(GeyeBaseModel):
     """
     event_id: GitHub事件的唯一ID
     event_type: GitHub的类型
@@ -56,7 +54,7 @@ class MonitorResultsModel(GeyeBaseModel):
 
     content = models.TextField()
 
-    event_created_time = models.DateTimeField(default=time.time())
+    event_created_time = models.DateTimeField(auto_now_add=True)
 
     objects = models.Manager()
     instance = MonitorResultsManager()
