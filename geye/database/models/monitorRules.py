@@ -56,7 +56,7 @@ class GeyeMonitorRules(GeyeBaseModel):
         db_table = "geye_monitor_rules"
 
     task_type = models.CharField(default="", max_length=32)
-    event_type = models.CharField(default="", max_length=32)
+    event_type = models.CharField(default="", max_length=128)
     rule_content = models.TextField()
     status = models.BooleanField(default=True)
     interval = models.IntegerField(default=5)
