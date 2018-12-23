@@ -34,11 +34,13 @@ class GeyeMonitorResultsModel(GeyeBaseModel):
     repo_url: 产生事件的repo，为对应repo的页面URL
     repo_name: 产生事件的repo名称
     content: 事件的内容，由每个事件的parser生成，格式不固定，但是均为可读字符串
+    monitor_rule_id: 由哪个监控规则捕捉到的
     """
 
     class Meta:
         db_table = "geye_monitor_results"
 
+    monitor_rule_id = models.BigIntegerField(default=0)
     event_id = models.BigIntegerField(default=0)
     event_type = models.CharField(default="", max_length=128)
 

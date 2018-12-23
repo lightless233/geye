@@ -63,4 +63,6 @@ class MonitorRefreshEngine(SingleThreadEngine):
                     _row.last_fetch_time = current_time
                     _row.save()
 
+            self.ev.wait(30)
+
         logger.info("{name} stop!".format(name=self.name))

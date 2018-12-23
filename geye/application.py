@@ -19,6 +19,7 @@ from typing import Union, Optional, List
 from django.conf import settings
 
 from geye.core.engine import RefreshEngine, SearchEngine, FilterEngine, SaveEngine
+from geye.core.engine.monitor import MonitorRefreshEngine, MonitorEngine
 from geye.utils.log import logger
 
 
@@ -29,6 +30,8 @@ class GeyeApplication(object):
         SEARCH_ENGINE: SearchEngine = None
         FILTER_ENGINE: FilterEngine = None
         SAVE_ENGINE: SaveEngine = None
+        MONITOR_REFRESH_ENGINE: MonitorRefreshEngine = None
+        MONITOR_ENGINE: MonitorEngine = None
 
     class MessageQueues:
         """存储所有的消息队列"""
@@ -96,6 +99,12 @@ class GeyeApplication(object):
 
             self.Engines.REFRESH_ENGINE = RefreshEngine(app_ctx=self, name="RefreshEngine")
             self.Engines.REFRESH_ENGINE.start()
+
+            self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorEngine")
+            self.Engines.MONITOR_ENGINE.start()
+
+            self.Engines.MONITOR_REFRESH_ENGINE = MonitorRefreshEngine(app_ctx=self, name="MonitorRefreshEngine")
+            self.Engines.MONITOR_REFRESH_ENGINE.start()
         else:
             if "save_engine" in engines:
                 self.Engines.SAVE_ENGINE = SaveEngine(app_ctx=self, name="SaveEngine")
@@ -109,8 +118,14 @@ class GeyeApplication(object):
             if "refresh_engine" in engines:
                 self.Engines.REFRESH_ENGINE = RefreshEngine(app_ctx=self, name="RefreshEngine")
                 self.Engines.REFRESH_ENGINE.start()
+            if "monitor_refresh_engine" in engines:
+                self.Engines.MONITOR_REFRESH_ENGINE = MonitorRefreshEngine(app_ctx=self, name="MonitorRefreshEngine")
+                self.Engines.MONITOR_REFRESH_ENGINE.start()
+            if "monitor_engine" in engines:
+                self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorEngine")
+                self.Engines.MONITOR_ENGINE.start()
 
-    def start(self):
+    def start(self, queues=None, engines=None):
 
         # 注册CTRL+C处理器
         signal.signal(signal.SIGINT, self.__sigint_signal_handler)
@@ -126,5 +141,8 @@ class GeyeApplication(object):
             # 单机模式启动，启动自己的队列和全部engine
             self.__init_queues(queues=None)
             self.__init_engines(engines=None)
+        elif run_mode == "test":
+            self.__init_queues(queues=queues)
+            self.__init_engines(engines=engines)
         else:
             raise RuntimeError("错误的启动参数! 不支持: {}".format(run_mode))
