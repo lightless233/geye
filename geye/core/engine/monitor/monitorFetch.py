@@ -61,7 +61,7 @@ class MonitorEngine(MultiThreadEngine):
         :return:
         """
         while self.__is_running():
-            logger.debug("queue size: {}".format(self._monitor_task_queue.qsize()))
+            # logger.debug("queue size: {}".format(self._monitor_task_queue.qsize()))
             try:
                 task: PriorityTask = self._monitor_task_queue.get_nowait()
                 return task.priority, task.data

@@ -33,6 +33,9 @@ class CommonBaseEngine(object):
         self.thread: threading.Thread = None
         self.thread_pool: List[threading.Thread] = None
 
+    def is_running(self):
+        return self.status == self.EngineStatus.RUNNING
+
     @abc.abstractmethod
     def start(self):
         pass

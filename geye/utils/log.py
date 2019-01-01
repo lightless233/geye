@@ -42,6 +42,7 @@ LEVEL_SUFFIX = {
     "warning": ".WARNING",
     "error": ".ERROR",
     "critical": ".CRITICAL",
+    "all": ".ALL",
 }
 
 # 用户配置部分 ↑
@@ -118,20 +119,31 @@ class FileLoggerFilter(logging.Filter):
         self.level = level.upper()
 
     def filter(self, record: logging.LogRecord):
-        return record.levelname == self.level
+        """
+        Is the specified record to be logged? Returns zero for no, nonzero for yes.
+        :param record:
+        :return:
+        """
+        if self.level == "all":
+            return True
+        else:
+            return record.levelname == self.level
 
 
 class GeyeLogger:
-    def __init__(self, log_filename: str, log_level: str = "DEBUG"):
+    def __init__(self, log_filename: str = None, log_level: str = "DEBUG"):
         super(GeyeLogger, self).__init__()
-
-        self.log_filename = log_filename
+        if not log_filename:
+            self.log_filename = settings.LOG_FILENAME
+        else:
+            self.log_filename = log_filename
 
         # 用于输出到stream中的logger
         self._stream_logger = logging.getLogger(__name__)
 
         # 输出到文件的logger
         self._file_loggers = {
+            "all": logging.getLogger("{}.{}".format(__name__, "_ALL")),
             "info": logging.getLogger("{}.{}".format(__name__, "_INFO")),
             "debug": logging.getLogger("{}.{}".format(__name__, "_DEBUG")),
             "error": logging.getLogger("{}.{}".format(__name__, "_ERROR")),
@@ -216,5 +228,5 @@ def get_logger(log_to_file=True, log_filename="default.log", log_level="DEBUG"):
     return _logger
 
 
-# logger = get_logger(log_to_file=settings.LOG_TO_FILE, log_filename=settings.LOG_FILENAME)
-logger = GeyeLogger(settings.LOG_FILENAME)
+logger = get_logger(log_to_file=settings.LOG_TO_FILE, log_filename=settings.LOG_FILENAME)
+# logger = GeyeLogger(settings.LOG_FILENAME)

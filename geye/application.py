@@ -60,6 +60,8 @@ class GeyeApplication(object):
         self.Engines.SEARCH_ENGINE.stop()
         self.Engines.FILTER_ENGINE.stop()
         self.Engines.SAVE_ENGINE.stop()
+        self.Engines.MONITOR_REFRESH_ENGINE.stop()
+        self.Engines.MONITOR_ENGINE.stop()
 
     def __init_queues(self, queues: Optional[List[str]]):
         """初始化程序运行所需的队列"""
