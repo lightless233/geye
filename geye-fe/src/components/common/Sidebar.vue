@@ -59,9 +59,9 @@
                 title: "搜索规则管理",
               },
               {
-                index: "/rule/special-monitor",
-                title: "重点监控管理",
-              }
+                index: "/monitor/rules",
+                title: "监控规则管理",
+              },
             ]
           },
           {
