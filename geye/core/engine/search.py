@@ -72,6 +72,7 @@ class SearchEngine(MultiThreadEngine):
                 self.filter_task_queue.put_nowait(task)
                 break
             except queue.Full:
+                logger.warning("FilterTask队列已满，1秒后重试.")
                 self.ev.wait(1)
                 continue
 

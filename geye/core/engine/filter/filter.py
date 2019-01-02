@@ -122,6 +122,12 @@ class FilterEngine(MultiThreadEngine):
                 target_queue.put_nowait(PriorityTask(task[0], task[1]))
                 break
             except queue.Full:
+                # get queue name
+                q_name = "unknown"
+                for k, v in self.__dict__.items():
+                    if v is target_queue:
+                        q_name = k
+                logger.debug("{q_name}已满，1秒后重试.".format(q_name=q_name))
                 self.ev.wait(1)
                 continue
 
