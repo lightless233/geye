@@ -34,7 +34,7 @@ $ pip install "requests[socks]"
 $ pip install "gunicorn[tornado]"
 ```
 
-#### 2.2 部署后端
+#### 2.2 部署Web后端
 在正式部署后端前，需要您手动复制几个内置的配置文件，并填入一些信息。
 
 ```bash
@@ -48,11 +48,11 @@ $ pip install "gunicorn[tornado]"
 # ！！！1. 修改配置文件中的DEBUG开关！！！
 # ！！！2. 其他配置项请酌情修改！！！
 (venv) $ python manage.py migrate
-(venv) $ chmod +x start.sh && ./start.sh
+(venv) $ chmod +x ./tools/*.sh && ./tools/start_web.sh
 
 ```
 
-#### 2.3 部署前端
+#### 2.3 部署Web前端
 部署前端除了需要修改配置文件外，还需要配置nginx反向代理，这里提供了一份默认的nginx配置文件，只需要稍加修改即可。
 
 ```bash
@@ -65,7 +65,10 @@ $ cp ./APP-META/geye.nginx.conf /path/to/your/nginx/conf/dir/geye.nginx.conf
 $ nginx -t && nginx -s reload
 ```
 
-#### 2.4 大功告成
+#### 2.4 部署引擎
+> 编辑中...
+
+#### 2.5 大功告成
 Enjoy It!
 
 # 版权信息

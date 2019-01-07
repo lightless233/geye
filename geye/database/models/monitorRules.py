@@ -18,13 +18,20 @@ from django.db import models
 from .base import GeyeBaseModel
 
 
-class MonitorTaskTypeConstant:
+class CommonConstant:
+    @staticmethod
+    def lst():
+        obj = filter(lambda i: i[0].isupper() , MonitorEventTypeConstant.__dict__.items())
+        return [x[1] for x in list(obj)]
+
+
+class MonitorTaskTypeConstant(CommonConstant):
     REPO = "repo"
     ORG = "org"
     USER = "user"
 
 
-class MonitorEventTypeConstant:
+class MonitorEventTypeConstant(CommonConstant):
     PUSH_EVENT = "push_event"
     RELEASE_EVENT = "release_event"
 
