@@ -18,8 +18,27 @@
         <el-button type="primary" size="small" round @click="handleOpenDialog('add', -1, -1)">新建监控规则</el-button>
       </div>
       <!-- 表格，展示所有的监控规则 -->
-      <el-table>
-
+      <el-table :data="tableAttrs.dataset" style="width: 100%" v-loading="tableAttrs.loading">
+        <el-table-column prop="id" label="#" width="100px"></el-table-column>
+        <el-table-column label="任务类型" >
+          <template slot-scope="scope">{{convertTaskType(scope.row.taskType)}}</template>
+        </el-table-column>
+        <el-table-column label="事件类型" >
+          <template slot-scope="scope">{{convertEventType(scope.row.eventType)}}</template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <el-tag type="danger" v-if="!scope.row.status" style="cursor: pointer">关闭</el-tag>
+            <el-tag type="success" v-else-if="scope.row.status" style="cursor: pointer">开启</el-tag>
+            <el-tag v-else style="cursor: pointer">未知</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button size="mini" type="primary" round @click="">编辑</el-button>
+            <el-button size="mini" type="danger" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <!-- ./主容器 -->
@@ -27,7 +46,7 @@
 
     <!-- 新建、编辑监控规则的dialog -->
     <el-dialog :title="dialogAttrs.title" :visible.sync="dialogAttrs.show">
-      <el-form label-width="100px" :model="dialogAttrs.form" :loading="dialogAttrs.loading">
+      <el-form label-width="100px" :model="dialogAttrs.form" v-loading="dialogAttrs.loading">
         <el-row>
           <el-col :span="12">
             <el-form-item label="任务类型">
@@ -111,11 +130,57 @@
             priority: 5,
           }
         },
-        tableDataSet: [],
+        tableAttrs: {
+          dataset: [],
+          loading: false,
+        },
       }
+    },
+    computed: {},
+    // 加载页面时读取所有的规则
+    mounted() {
+      this.tableAttrs.loading = true;
+      sMonitorRule.getAllMonitorRule(this)
+        .then(resp => {
+          let code = resp.data.code;
+          let message = resp.data.message;
+          if (code === 1001) {
+            this.tableAttrs.dataset = resp.data.data;
+          } else {
+            this.$message.error(message);
+          }
+        })
+        .catch(err => {
+          console.error(`error: ${err}`);
+          this.$message.error(ApiConstant.error_500);
+        })
+        .then(() => {
+          this.tableAttrs.loading = false;
+        })
     },
     // all methods
     methods: {
+      convertTaskType: function (val) {
+        if (val === "repo") {
+          return "仓库监控";
+        } else if (val === "user") {
+          return "用户监控";
+        } else if (val === "org") {
+          return "组织监控";
+        } else {
+          return "未知";
+        }
+      },
+
+      convertEventType: function (val) {
+        if (val === "push_event") {
+          return "PushEvent";
+        } else if (val === "release_event") {
+          return "ReleaseEvent";
+        } else {
+          return "未知";
+        }
+      },
       clearForm: function () {
         this.dialogAttrs.form.taskType = null;
         this.dialogAttrs.form.eventType = null;
@@ -184,6 +249,29 @@
           .then(() => {
             this.dialogAttrs.loading = false;
           });
+      },
+
+      handleDelete: function (idx, row) {
+        this.tableAttrs.loading = true;
+        let id = row.id;
+        sMonitorRule.deleteMonitorRule(this, id)
+          .then(resp => {
+            let code = resp.data.code;
+            let message = resp.data.message;
+            if (code === 1001) {
+              this.tableAttrs.dataset.splice(idx, 1);
+              this.$message.success(message);
+            } else {
+              this.$message.error(message);
+            }
+          })
+          .catch(err => {
+            console.error(`error: ${err}`);
+            this.$message.error(ApiConstant.error_500);
+          })
+          .then(() => {
+            this.tableAttrs.loading = false;
+          })
       }
     }
   }

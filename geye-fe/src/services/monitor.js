@@ -8,6 +8,7 @@ const API_LIST = {
   "add": `${BASE_PATH}/new`,
   "update": `${BASE_PATH}/update`,
   "delete": `${BASE_PATH}/delete`,
+  all: `${BASE_PATH}/all`,
 };
 
 export default {
@@ -23,5 +24,9 @@ export default {
   deleteMonitorRule(context, id) {
     return context.axios.post(API_LIST.delete, {id: id});
   },
+
+  getAllMonitorRule(context) {
+    return context.axios.get(API_LIST.all);
+  }
 
 }

@@ -13,15 +13,15 @@
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
 
-from django.db import models
+from django.db import models, transaction
 
 from .base import GeyeBaseModel
 
 
 class CommonConstant:
-    @staticmethod
-    def lst():
-        obj = filter(lambda i: i[0].isupper() , MonitorEventTypeConstant.__dict__.items())
+    @classmethod
+    def lst(cls):
+        obj = filter(lambda i: i[0].isupper() , cls.__mro__[0].__dict__.items())
         return [x[1] for x in list(obj)]
 
 
@@ -38,7 +38,34 @@ class MonitorEventTypeConstant(CommonConstant):
 
 class MonitorRulesManager(models.Manager):
     def get_all(self):
+        """
+        获取所有的记录
+        :return:
+        """
         return self.filter(is_deleted=False).all()
+
+    def is_pk_exist(self, pk):
+        """
+        根据主键判断对应的记录是否存在
+        :param pk:
+        :return:
+        """
+        return self.filter(is_deleted=False, pk=pk).first()
+
+    def fake_delete_by_pk(self, pk):
+        """
+        根据主键删除一条规则
+        :param pk: 主键ID
+        :return: boolean
+        """
+        with transaction.atomic():
+            obj: GeyeMonitorRules = self.select_for_update().filter(is_deleted=False, pk=pk).first()
+            if not obj:
+                return False
+            else:
+                obj.is_deleted = True
+                obj.save()
+                return True
 
 
 class GeyeMonitorRules(GeyeBaseModel):

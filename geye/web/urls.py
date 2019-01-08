@@ -69,4 +69,5 @@ urlpatterns = [
     path("v1/rule/monitor/new", monitor.AddMonitorRuleView.as_view()),
     path("v1/rule/monitor/update", monitor.UpdateMonitorRuleView.as_view()),
     path("v1/rule/monitor/delete", monitor.DeleteMonitorRuleView.as_view()),
+    path("v1/rule/monitor/all", monitor.MonitorRulesView.as_view()),
 ]
