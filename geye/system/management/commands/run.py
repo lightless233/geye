@@ -19,13 +19,14 @@ from geye.core import data as gdata
 
 
 class Command(BaseCommand):
-
     help = "Start the GEYE application."
     available_opts = ["server", "agent", "single"]
 
     def add_arguments(self, parser):
-        parser.add_argument("--single", action="store_const", const="single", dest="run_mode", help="Run GEYE as single app. (Default)")
-        parser.add_argument("--server", action="store_const", const="server", dest="run_mode", help="Run GEYE as server.")
+        parser.add_argument("--single", action="store_const", const="single", dest="run_mode",
+                            help="Run GEYE as single app. (Default)")
+        parser.add_argument("--server", action="store_const", const="server", dest="run_mode",
+                            help="Run GEYE as server.")
         parser.add_argument("--agent", action="store_const", const="agent", dest="run_mode", help="Run GEYE as agent.")
 
     def handle(self, *args, **options):

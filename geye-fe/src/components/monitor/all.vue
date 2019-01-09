@@ -72,6 +72,12 @@
         <el-form-item label="监控内容">
           <el-input type="textarea" :autosize="{minRows: 3, maxRows: 3}"
                     v-model="dialogAttrs.form.ruleContent"></el-input>
+          <div>
+            规则样例:<br>
+            1. 组织监控：{"org_name": ""}<br>
+            2. 仓库监控：{"owner": "", "repo_name": ""}<br>
+            3. 用户监控：{"username": ""}
+          </div>
         </el-form-item>
 
         <el-row>
