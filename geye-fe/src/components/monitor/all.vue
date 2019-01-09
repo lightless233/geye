@@ -20,20 +20,21 @@
       <!-- 表格，展示所有的监控规则 -->
       <el-table :data="tableAttrs.dataset" style="width: 100%" v-loading="tableAttrs.loading">
         <el-table-column prop="id" label="#" width="100px"></el-table-column>
-        <el-table-column label="任务类型" >
+        <el-table-column label="任务类型" width="150px">
           <template slot-scope="scope">{{convertTaskType(scope.row.taskType)}}</template>
         </el-table-column>
-        <el-table-column label="事件类型" >
+        <el-table-column label="事件类型" width="150px">
           <template slot-scope="scope">{{convertEventType(scope.row.eventType)}}</template>
         </el-table-column>
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="status" label="状态" width="100px">
           <template slot-scope="scope">
             <el-tag type="danger" v-if="!scope.row.status" style="cursor: pointer">关闭</el-tag>
             <el-tag type="success" v-else-if="scope.row.status" style="cursor: pointer">开启</el-tag>
             <el-tag v-else style="cursor: pointer">未知</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="ruleContent" label="监控内容" align="center"></el-table-column>
+        <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
             <el-button size="mini" type="primary" round @click="">编辑</el-button>
             <el-button size="mini" type="danger" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -211,9 +212,9 @@
 
       handleConfirm: function () {
         // 处理dialog，根据不同的type，调用不同的service
-        console.log(this.dialogAttrs.form);
+        // console.log(this.dialogAttrs.form);
         let confirmType = this.dialogAttrs.type;
-        console.log(`confirmType: ${confirmType}`);
+        // console.log(`confirmType: ${confirmType}`);
 
         this.dialogAttrs.loading = true;
 
@@ -234,7 +235,7 @@
             if (code === 1001) {
               this.$message.success(msg);
               if (confirmType === "add") {
-                this.tableDataSet.push(resp.data.data);
+                this.tableAttrs.dataset.push(resp.data.data);
               } else if (confirmType === "update") {
                 // TODO: 更新表格中对应的数据
               }

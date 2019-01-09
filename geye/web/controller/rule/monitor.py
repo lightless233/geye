@@ -87,7 +87,7 @@ class AddMonitorRuleView(View):
             status=params.get("status"), interval=params.get("interval"), priority=params.get("priority")
         )
         if obj:
-            return JsonResponse({"code": 1001, "message": "添加成功"})
+            return JsonResponse({"code": 1001, "message": "添加成功", "data": obj.convert_to_dict()})
         else:
             return JsonResponse({"code": 1002, "message": "添加失败"})
 

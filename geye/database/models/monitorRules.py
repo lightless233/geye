@@ -21,7 +21,7 @@ from .base import GeyeBaseModel
 class CommonConstant:
     @classmethod
     def lst(cls):
-        obj = filter(lambda i: i[0].isupper() , cls.__mro__[0].__dict__.items())
+        obj = filter(lambda i: i[0].isupper(), cls.__mro__[0].__dict__.items())
         return [x[1] for x in list(obj)]
 
 
@@ -86,6 +86,7 @@ class GeyeMonitorRules(GeyeBaseModel):
     priority:
         优先级，1-10
     """
+
     class Meta:
         db_table = "geye_monitor_rules"
 
@@ -99,3 +100,15 @@ class GeyeMonitorRules(GeyeBaseModel):
 
     objects = models.Manager()
     instance = MonitorRulesManager()
+
+    def convert_to_dict(self):
+        return {
+            "id": self.id,
+            "taskType": self.task_type,
+            "eventType": self.event_type,
+            "ruleContent": self.rule_content,
+            "status": self.status,
+            "interval": self.interval,
+            "priority": self.priority,
+            "lastFetchTime": self.last_fetch_time,
+        }
