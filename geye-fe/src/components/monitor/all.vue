@@ -201,7 +201,7 @@
           this.dialogAttrs.title = "新建监控规则";
           this.dialogAttrs.confirmBtnText = "添 加";
           this.dialogAttrs.type = "add";
-          // this.clearForm();
+          this.clearForm();
           this.dialogAttrs.show = true;
         } else if (type === "update") {
           // 修改监控规则
@@ -262,6 +262,7 @@
                 // 更新表格中对应的数据
                 let row = this.tableAttrs.dataset[this.dialogAttrs.currentTableIdx];
                 let form = this.dialogAttrs.form;
+
                 row.taskType = form.taskType;
                 row.eventType = form.eventType;
                 row.status = form.status;
