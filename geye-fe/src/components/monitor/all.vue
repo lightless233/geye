@@ -263,12 +263,10 @@
                 let row = this.tableAttrs.dataset[this.dialogAttrs.currentTableIdx];
                 let form = this.dialogAttrs.form;
 
-                row.taskType = form.taskType;
-                row.eventType = form.eventType;
-                row.status = form.status;
-                row.priority = form.priority;
-                row.ruleContent = form.ruleContent;
-                row.interval = form.interval;
+                let keys = ["taskType", "eventType", "status", "priority", "ruleContent", "interval"];
+                for (const key of keys) {
+                  row[key] = form[key];
+                }
               }
 
             } else {
