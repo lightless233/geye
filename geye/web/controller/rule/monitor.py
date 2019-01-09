@@ -99,6 +99,9 @@ class UpdateMonitorRuleView(View):
 
     @staticmethod
     def post(request):
+
+        logger.debug(f"POST data: {request.body}")
+
         # 校验参数
         validator = RequestValidator()
         result = validator.check_params(request, check_params=[

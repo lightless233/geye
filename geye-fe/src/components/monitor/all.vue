@@ -36,7 +36,9 @@
         <el-table-column prop="ruleContent" label="监控内容" align="center"></el-table-column>
         <el-table-column label="操作" width="150px">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" round @click="">编辑</el-button>
+            <el-button size="mini" type="primary" round @click="handleOpenDialog('update', scope.$index, scope.row)">
+              编辑
+            </el-button>
             <el-button size="mini" type="danger" round @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -123,13 +125,15 @@
           loading: false,
           type: "unknown", // add, update
           form: {
+            id: null,
             taskType: null,
             eventType: null,
             ruleContent: null,
             status: 1,
             interval: 5,
             priority: 5,
-          }
+          },
+          currentTableIdx: null,
         },
         tableAttrs: {
           dataset: [],
@@ -189,6 +193,7 @@
         this.dialogAttrs.form.status = 1;
         this.dialogAttrs.form.interval = 5;
         this.dialogAttrs.form.priority = 5;
+        this.dialogAttrs.form.id = null;
       },
       handleOpenDialog: function (type, tableIdx, row) {
         if (type === "add") {
@@ -196,10 +201,23 @@
           this.dialogAttrs.title = "新建监控规则";
           this.dialogAttrs.confirmBtnText = "添 加";
           this.dialogAttrs.type = "add";
-          this.clearForm();
+          // this.clearForm();
           this.dialogAttrs.show = true;
         } else if (type === "update") {
           // 修改监控规则
+          this.dialogAttrs.title = "编辑监控规则";
+          this.dialogAttrs.confirmBtnText = "更 新";
+          this.dialogAttrs.type = "update";
+          this.dialogAttrs.currentTableIdx = tableIdx;
+          this.dialogAttrs.show = true;
+
+          this.dialogAttrs.form.eventType = row.eventType;
+          this.dialogAttrs.form.taskType = row.taskType;
+          this.dialogAttrs.form.priority = row.priority;
+          this.dialogAttrs.form.interval = row.interval;
+          this.dialogAttrs.form.status = Number(row.status);
+          this.dialogAttrs.form.ruleContent = row.ruleContent;
+          this.dialogAttrs.form.id = row.id;
         } else {
           this.$message.error("操作错误!");
         }
@@ -234,11 +252,24 @@
             let msg = resp.data.message;
             if (code === 1001) {
               this.$message.success(msg);
+
               if (confirmType === "add") {
                 this.tableAttrs.dataset.push(resp.data.data);
+                this.dialogAttrs.show = false;
+                this.clearForm();
+
               } else if (confirmType === "update") {
-                // TODO: 更新表格中对应的数据
+                // 更新表格中对应的数据
+                let row = this.tableAttrs.dataset[this.dialogAttrs.currentTableIdx];
+                let form = this.dialogAttrs.form;
+                row.taskType = form.taskType;
+                row.eventType = form.eventType;
+                row.status = form.status;
+                row.priority = form.priority;
+                row.ruleContent = form.ruleContent;
+                row.interval = form.interval;
               }
+
             } else {
               this.$message.error(msg);
             }
