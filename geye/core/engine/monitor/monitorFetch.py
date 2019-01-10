@@ -25,7 +25,7 @@ from requests import Response
 
 from geye.core.engine.base import MultiThreadEngine
 from geye.database.models import GeyeTokenModel
-from geye.database.models.monitorRules import MonitorTaskTypeConstant
+from geye.database.models.monitorRules import MonitorTaskTypeConstant, MonitorEventTypeConstant
 from geye.utils.datatype import PriorityTask
 from geye.utils.log import logger
 
@@ -157,8 +157,31 @@ class MonitorEngine(MultiThreadEngine):
         :param event_type: 要监控的event类型
         :return:
         """
-        # data = json.loads(results)
-        pass
+        return_val = {
+            "success": False,
+            "message": "",
+            "events": [],
+        }
+
+        # 验证待监控的event_type的合法性
+        available_events = MonitorEventTypeConstant.lst()
+        for _e in event_type:
+            if _e not in available_events:
+                return_val["message"] = "未知的event_type类型：{et}".format(et=_e)
+                return return_val
+
+        data = json.loads(results)
+
+        if event_type == MonitorTaskTypeConstant.USER:
+            pass
+        elif event_type == MonitorTaskTypeConstant.ORG:
+            pass
+        elif event_type == MonitorTaskTypeConstant.REPO:
+            pass
+        else:
+            logger.error("错误的eventType，解析失败!")
+            return_val["message"] = "错误的eventType，解析失败!"
+            return return_val
 
     def _worker(self):
         logger.info("{name} start!".format(name=self.name))
