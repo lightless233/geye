@@ -37,6 +37,20 @@ MonitorAPIUrl = {
 }
 
 
+class EventParser:
+    """
+    event的解析器
+    """
+    @staticmethod
+    def parse_push_event():
+        pass
+
+    @staticmethod
+    def parse_release_event():
+        pass
+
+
+
 class MonitorEngine(MultiThreadEngine):
 
     def __init__(self, app_ctx, name, pool_size=None):
@@ -150,7 +164,7 @@ class MonitorEngine(MultiThreadEngine):
                 return_val["reason"] = "{e}".format(e=e)
                 return return_val
 
-    def __parse_event(self, results: str, event_type: list) -> dict:
+    def __parse_data(self, results: str, event_type: list, task_type: str) -> dict:
         """
         从API的返回中解析出对应event的信息
         :param results: API的返回
@@ -172,11 +186,15 @@ class MonitorEngine(MultiThreadEngine):
 
         data = json.loads(results)
 
-        if event_type == MonitorTaskTypeConstant.USER:
+        if task_type == MonitorTaskTypeConstant.USER:
+            for _item in data:
+                if _item.get("type") in event_type:
+                    # 找到了符合预期的event_type
+                    # 添加到return_val中
+                    pass
+        elif task_type == MonitorTaskTypeConstant.ORG:
             pass
-        elif event_type == MonitorTaskTypeConstant.ORG:
-            pass
-        elif event_type == MonitorTaskTypeConstant.REPO:
+        elif task_type == MonitorTaskTypeConstant.REPO:
             pass
         else:
             logger.error("错误的eventType，解析失败!")
@@ -222,7 +240,7 @@ class MonitorEngine(MultiThreadEngine):
             logger.debug("results: {}".format(results))
 
             # 从API的返回中parse对应的时间内容，event_type可以为多个事件
-            # events = self.__parse_event(results["data"], event_type)
+            events = self.__parse_data(results["data"], event_type, task_type)
 
             # 把event存起来
             # self.__save_events(events)
