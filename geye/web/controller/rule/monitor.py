@@ -38,7 +38,7 @@ class MonitorRulesView(View):
                 {
                     "id": row.id,
                     "taskType": row.task_type,
-                    "eventType": row.event_type,
+                    "eventType": row.event_type.split(","),
                     "ruleContent": row.rule_content,
                     "status": row.status,
                     "interval": row.interval,
@@ -61,6 +61,9 @@ class AddMonitorRuleView(View):
 
     @staticmethod
     def post(request):
+
+        logger.debug(f"POST data: {request.body}")
+
         # 校验参数
         validator = RequestValidator()
         result = validator.check_params(request, check_params=[
@@ -78,12 +81,13 @@ class AddMonitorRuleView(View):
         logger.debug(f"EventTypeConstantList: {MonitorEventTypeConstant.lst()}")
         if task_type not in MonitorTaskTypeConstant.lst():
             return JsonResponse({"code": 1003, "message": "taskType有误!"})
-        if event_type not in MonitorEventTypeConstant.lst():
-            return JsonResponse({"code": 1003, "message": "eventType有误!"})
+        for _post_event_type in event_type:
+            if _post_event_type not in MonitorEventTypeConstant.lst():
+                return JsonResponse({"code": 1003, "message": "eventType有误!"})
 
         # 插入数据
         obj = GeyeMonitorRules.instance.create(
-            task_type=task_type, event_type=event_type, rule_content=params.get("ruleContent"),
+            task_type=task_type, event_type=",".join(event_type), rule_content=params.get("ruleContent"),
             status=params.get("status"), interval=params.get("interval"), priority=params.get("priority")
         )
         if obj:
@@ -116,8 +120,9 @@ class UpdateMonitorRuleView(View):
         event_type = params.get("eventType")
         if task_type not in MonitorTaskTypeConstant.lst():
             return JsonResponse({"code": 1003, "message": "taskType有误!"})
-        if event_type not in MonitorEventTypeConstant.lst():
-            return JsonResponse({"code": 1003, "message": "eventType有误!"})
+        for _post_event_type in event_type:
+            if _post_event_type not in MonitorEventTypeConstant.lst():
+                return JsonResponse({"code": 1003, "message": "eventType有误!"})
 
         # 更新数据
         with transaction.atomic():
@@ -127,7 +132,7 @@ class UpdateMonitorRuleView(View):
                 return JsonResponse({"code": 1003, "message": "规则不存在!"})
 
             obj.task_type = task_type
-            obj.event_type = event_type
+            obj.event_type = ",".join(event_type)
             obj.rule_content = params.get("ruleContent")
             obj.status = params.get("status")
             obj.interval = params.get("interval")

@@ -24,7 +24,7 @@
           <template slot-scope="scope">{{convertTaskType(scope.row.taskType)}}</template>
         </el-table-column>
         <el-table-column label="事件类型" width="150px">
-          <template slot-scope="scope">{{convertEventType(scope.row.eventType)}}</template>
+          <template slot-scope="scope"><span v-html="convertEventType(scope.row.eventType)"></span></template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100px">
           <template slot-scope="scope">
@@ -62,9 +62,10 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="事件类型">
-              <el-select v-model="dialogAttrs.form.eventType" :value="dialogAttrs.form.eventType" style="width: 100%">
-                <el-option value="push_event" label="PushEvent"></el-option>
-                <el-option value="release_event" label="ReleaseEvent"></el-option>
+              <el-select multiple v-model="dialogAttrs.form.eventType" :value="dialogAttrs.form.eventType"
+                         style="width: 100%">
+                <el-option key="push_event" value="push_event" label="PushEvent"></el-option>
+                <el-option key="release_event" value="release_event" label="ReleaseEvent"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -184,13 +185,20 @@
       },
 
       convertEventType: function (val) {
-        if (val === "push_event") {
-          return "PushEvent";
-        } else if (val === "release_event") {
-          return "ReleaseEvent";
-        } else {
-          return "未知";
+
+        let return_val = Array();
+
+        for (let i = 0; i < val.length; i++) {
+          if (val[i] === "push_event") {
+            return_val.push("PushEvent");
+          } else if (val[i] === "release_event") {
+            return_val.push("ReleaseEvent");
+          } else {
+            return "未知";
+          }
         }
+
+        return return_val.join("<br>");
       },
       clearForm: function () {
         this.dialogAttrs.form.taskType = null;

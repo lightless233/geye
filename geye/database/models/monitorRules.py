@@ -77,6 +77,10 @@ class GeyeMonitorRules(GeyeBaseModel):
         目前支持：PushEvent，ReleaseEvent
     rule_content:
         监控的内容，根据task_type的不同，这里代表的含义也不同
+        是个JSON字符串
+            1. 组织监控：{"org_name": ""}
+            2. 仓库监控：{"owner": "", "repo_name": ""}
+            3. 用户监控：{"username": ""}
     status:
         规则状态，是否开启
     interval:
@@ -90,7 +94,7 @@ class GeyeMonitorRules(GeyeBaseModel):
     class Meta:
         db_table = "geye_monitor_rules"
 
-    task_type = models.CharField(default="", max_length=32)
+    task_type = models.CharField(default="", max_length=32, db_index=True)
     event_type = models.CharField(default="", max_length=128)
     rule_content = models.TextField()
     status = models.BooleanField(default=True)
