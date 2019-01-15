@@ -17,6 +17,7 @@
 """
 import json
 import queue
+from typing import List, Dict
 
 import random
 import requests
@@ -42,13 +43,68 @@ class EventParser:
     event的解析器
     """
     @staticmethod
-    def parse_push_event():
+    def parse_push_event(event_data: dict) -> dict:
+        # event_id和event_type这两个字段一定存在
+        event_id = event_data.get("id")
+        event_type = event_data.get("type")
+
+        # actor应该也是一定存在的
+        actor: Dict = event_data.get("actor")
+        actor_url = actor.get("url")
+        actor_login = actor.get("login")
+        actor_display_name = actor.get("display_login")
+
+        # org 不一定存在
+
+        # 基础信息也是一定存在的
+        created_time = event_data.get("created_at")
+
+
+    @staticmethod
+    def parse_release_event(event_data: dict) -> dict:
         pass
 
     @staticmethod
-    def parse_release_event():
-        pass
+    def parse(event_list: list, data: str) -> dict:
+        """
+        匹配event内容
+        :param event_list: 待监听的事件
+        :param data: 待处理的内容
+        :return:
+        """
 
+        # 返回值
+        retval = {
+            "success": False,
+            "message": "Unknown Error",
+            "data": [],     # typing: List[Dict]
+        }
+
+        # json化data
+        data = json.loads(data)
+
+        # 依次处理data中的每一项
+        _item: dict
+        for _item in data:
+
+            # 获取接收到的事件类型，并跳过不关心的事件
+            e_type = _item.get("type", None)
+            if e_type not in event_list:
+                continue
+
+            if e_type == MonitorEventTypeConstant.PUSH_EVENT:
+                retval["data"].append(
+                    EventParser.parse_push_event(_item)
+                )
+            elif e_type == MonitorEventTypeConstant.RELEASE_EVENT:
+                retval["data"].append(
+                    EventParser.parse_release_event(_item)
+                )
+            else:
+                logger.error("Unknown EventType: {}".format(e_type))
+                continue
+
+        return retval
 
 
 class MonitorEngine(MultiThreadEngine):
@@ -164,43 +220,6 @@ class MonitorEngine(MultiThreadEngine):
                 return_val["reason"] = "{e}".format(e=e)
                 return return_val
 
-    def __parse_data(self, results: str, event_type: list, task_type: str) -> dict:
-        """
-        从API的返回中解析出对应event的信息
-        :param results: API的返回
-        :param event_type: 要监控的event类型
-        :return:
-        """
-        return_val = {
-            "success": False,
-            "message": "",
-            "events": [],
-        }
-
-        # 验证待监控的event_type的合法性
-        available_events = MonitorEventTypeConstant.lst()
-        for _e in event_type:
-            if _e not in available_events:
-                return_val["message"] = "未知的event_type类型：{et}".format(et=_e)
-                return return_val
-
-        data = json.loads(results)
-
-        if task_type == MonitorTaskTypeConstant.USER:
-            for _item in data:
-                if _item.get("type") in event_type:
-                    # 找到了符合预期的event_type
-                    # 添加到return_val中
-                    pass
-        elif task_type == MonitorTaskTypeConstant.ORG:
-            pass
-        elif task_type == MonitorTaskTypeConstant.REPO:
-            pass
-        else:
-            logger.error("错误的eventType，解析失败!")
-            return_val["message"] = "错误的eventType，解析失败!"
-            return return_val
-
     def _worker(self):
         logger.info("{name} start!".format(name=self.name))
 
@@ -213,12 +232,12 @@ class MonitorEngine(MultiThreadEngine):
             # 解析task中的数据
             # {
             #     "task_type": _row.task_type, # 可选值来自 MonitorTaskTypeConstant，监控的维度
-            #     "event_type": _row.event_type, # 可选值来自MonitorEventTypeConstant，监控的事件类型
+            #     "event_type": _row.event_type, # 可选值来自MonitorEventTypeConstant，监控的事件类型，多个值用逗号分隔
             #     "rule_content": _row.rule_content, # 根据task_type有不同含义
             # }
             logger.debug("get task: {}".format(task))
             task_type = task.get("task_type", None)
-            event_type = task.get("event_type", None)
+            event_type: str = task.get("event_type", None)
             rule_content = task.get("rule_content", None)
             if not task_type or not event_type or not rule_content:
                 self.__wait(1)
@@ -240,7 +259,7 @@ class MonitorEngine(MultiThreadEngine):
             logger.debug("results: {}".format(results))
 
             # 从API的返回中parse对应的时间内容，event_type可以为多个事件
-            events = self.__parse_data(results["data"], event_type, task_type)
+            parse_result = EventParser.parse(event_type.split(","), results["data"])
 
             # 把event存起来
             # self.__save_events(events)

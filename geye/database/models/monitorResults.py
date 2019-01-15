@@ -26,13 +26,17 @@ class GeyeMonitorResultsModel(GeyeBaseModel):
     """
     event_id: GitHub事件的唯一ID
     event_type: GitHub的类型
+
     actor_url: 事件的actor，对应用户的个人页面的URL
     actor_login: actor的登录名
     actor_display_name: actor的实际显示名称
+
     org_url: 产生事件的org，为对应org的页面URL
     org_name: 产生事件的org的名称
+
     repo_url: 产生事件的repo，为对应repo的页面URL
     repo_name: 产生事件的repo名称
+
     content: 事件的内容，由每个事件的parser生成，格式不固定，但是均为可读字符串
     monitor_rule_id: 由哪个监控规则捕捉到的
     """

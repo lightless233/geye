@@ -32,8 +32,8 @@ class MonitorTaskTypeConstant(CommonConstant):
 
 
 class MonitorEventTypeConstant(CommonConstant):
-    PUSH_EVENT = "push_event"
-    RELEASE_EVENT = "release_event"
+    PUSH_EVENT = "PushEvent"
+    RELEASE_EVENT = "ReleaseEvent"
 
 
 class MonitorRulesManager(models.Manager):
