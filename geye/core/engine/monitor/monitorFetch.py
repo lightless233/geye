@@ -15,6 +15,7 @@
     :license:   GPL-3.0, see LICENSE for more details.
     :copyright: Copyright (c) 2017 lightless. All rights reserved
 """
+import datetime
 import json
 import queue
 from typing import List, Dict
@@ -30,7 +31,6 @@ from geye.database.models.monitorRules import MonitorTaskTypeConstant, MonitorEv
 from geye.utils.datatype import PriorityTask
 from geye.utils.log import logger
 
-
 MonitorAPIUrl = {
     MonitorTaskTypeConstant.ORG: "https://api.github.com/orgs/{org_name}/events",
     MonitorTaskTypeConstant.USER: "https://api.github.com/users/{username}/events",
@@ -42,30 +42,109 @@ class EventParser:
     """
     event的解析器
     """
+
     @staticmethod
-    def parse_push_event(event_data: dict) -> dict:
+    def parse_basic_item(event_data: Dict) -> Dict:
+        """
+        从event的内容中匹配出基础信息
+        :param event_data:
+        :return:
+        """
         # event_id和event_type这两个字段一定存在
         event_id = event_data.get("id")
         event_type = event_data.get("type")
 
-        # actor应该也是一定存在的
+        # actor是一定存在的
         actor: Dict = event_data.get("actor")
         actor_url = actor.get("url")
         actor_login = actor.get("login")
         actor_display_name = actor.get("display_login")
 
-        # org 不一定存在
+        # repo是一定存在的
+        repo: Dict = event_data.get("repo")
+        repo_name = repo.get("name")
+        repo_url = repo.get("url")
 
-        # 基础信息也是一定存在的
+        # org 不一定存在，如果没有则留空
+        org: Dict = event_data.get("org")
+        if not org:
+            org_url = ""
+            org_name = ""
+        else:
+            org_url = org.get("url")
+            org_name = org.get("login")
+
+        # event发生的时间是一定存在的
         created_time = event_data.get("created_at")
+        if created_time:
+            # "created_at": "2019-01-15T09:09:13Z"，这个是UTC时间，直接转成UTC+8的时间
+            strut_created_time = datetime.datetime.strptime(created_time, "%Y-%m-%dT%H:%M:%S%z")
+            tz = datetime.timezone(datetime.timedelta(hours=8))
+            strut_created_time = strut_created_time.astimezone(tz)
+            created_time = strut_created_time.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            created_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+        return {
+            "event_id": event_id,
+            "event_type": event_type,
+            "actor_url": actor_url,
+            "actor_login": actor_login,
+            "actor_display_name": actor_display_name,
+            "repo_name": repo_name,
+            "repo_url": repo_url,
+            "org_name": org_name,
+            "org_url": org_url,
+            "created_time": created_time,
+        }
 
     @staticmethod
-    def parse_release_event(event_data: dict) -> dict:
-        pass
+    def parse_push_event(event_data: Dict) -> Dict:
+
+        # 基础信息
+        basic_result = EventParser.parse_basic_item(event_data)
+
+        # payload是一定存在的
+        payload: Dict = event_data.get("payload")
+        payload_commits: List = payload.get("commits")
+        format_payloads = []
+        for _commits in payload_commits:
+            author = "{username} <{email}>".format(
+                username=_commits.get("author").get("name"),
+                email=_commits.get("author").get("email"),
+            )
+            message = _commits.get("message")
+            commit_url = _commits.get("url")
+            format_payloads.append({
+                "author": author,
+                "message": message,
+                "url": commit_url,
+            })
+
+        # 把解析出来的payloads放到basic_result里直接返回
+        basic_result["payloads"] = format_payloads
+        return basic_result
 
     @staticmethod
-    def parse(event_list: list, data: str) -> dict:
+    def parse_release_event(event_data: Dict) -> Dict:
+        # 基础信息
+        basic_result = EventParser.parse_basic_item(event_data)
+
+        # 解析payload
+        payload: Dict = event_data.get("payload")
+        release: Dict = payload.get("release")
+        html_url = release.get("html_url")
+        tag_name = release.get("tag_name")
+        release_name = release.get("name")
+
+        basic_result["payloads"] = {
+            "html_url": html_url,
+            "tag_name": tag_name,
+            "release_name": release_name
+        }
+
+    @staticmethod
+    def parse(event_list: list, data: str) -> Dict:
         """
         匹配event内容
         :param event_list: 待监听的事件
@@ -77,7 +156,7 @@ class EventParser:
         retval = {
             "success": False,
             "message": "Unknown Error",
-            "data": [],     # typing: List[Dict]
+            "data": [],  # typing: List[Dict]
         }
 
         # json化data

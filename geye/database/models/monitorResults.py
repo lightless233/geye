@@ -31,6 +31,7 @@ class GeyeMonitorResultsModel(GeyeBaseModel):
     actor_login: actor的登录名
     actor_display_name: actor的实际显示名称
 
+    # org不一定存在的，如果没有，这两个字段全部留空
     org_url: 产生事件的org，为对应org的页面URL
     org_name: 产生事件的org的名称
 
