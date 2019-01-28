@@ -137,11 +137,13 @@ class EventParser:
         tag_name = release.get("tag_name")
         release_name = release.get("name")
 
+        # 把解析出来的payloads放到basic_result里，直接返回
         basic_result["payloads"] = {
             "html_url": html_url,
             "tag_name": tag_name,
             "release_name": release_name
         }
+        return basic_result
 
     @staticmethod
     def parse(event_list: list, data: str) -> Dict:
@@ -337,10 +339,18 @@ class MonitorEngine(MultiThreadEngine):
 
             logger.debug("results: {}".format(results))
 
-            # 从API的返回中parse对应的时间内容，event_type可以为多个事件
+            # 从API的返回中parse对应的时间内容，event_type可以为多个事件，返回格式如下
+            # ret_val = {
+            #     "success": False,
+            #     "message": "Unknown Error",
+            #     "data": [],  # typing: List[Dict]
+            # }
             parse_result = EventParser.parse(event_type.split(","), results["data"])
-
-            # 把event存起来
-            # self.__save_events(events)
+            if not parse_result.get("success"):
+                logger.error(parse_result.get("message"))
+                continue
+            else:
+                # 把数据扔到队列里去，把event存起来
+                self.__put_task(task_priority, parse_result.get("data"))
 
         logger.info("{name} stop!".format(name=self.name))

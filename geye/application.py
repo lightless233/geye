@@ -46,6 +46,7 @@ class GeyeApplication(object):
 
         # 存储MonitorTask的queue
         MONITOR_TASK_QUEUE: queue.PriorityQueue = None
+        MONITOR_SAVE_QUEUE: queue.PriorityQueue = None
 
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
@@ -65,10 +66,11 @@ class GeyeApplication(object):
 
     def __init_queues(self, queues: Optional[List[str]]):
         """初始化程序运行所需的队列"""
-        search_queue_size = settings.SEARCH_TASK_QUEUE_SIZE
-        filter_queue_size = settings.FILTER_TASK_QUEUE_SIZE
-        save_queue_size = settings.SAVE_TASK_QUEUE_SIZE
-        monitor_queue_size = settings.MONITOR_TASK_QUEUE_SIZE
+        search_queue_size = settings.SEARCH_TASK_QUEUE_SIZE or 1024
+        filter_queue_size = settings.FILTER_TASK_QUEUE_SIZE or 1024
+        save_queue_size = settings.SAVE_TASK_QUEUE_SIZE or 1024
+        monitor_queue_size = settings.MONITOR_TASK_QUEUE_SIZE or 1024
+        monitor_save_queue_size = settings.MONITOR_SAVE_QUEUE_SIZE or 1024
 
         if queues is None:
             # 启动所有队列
@@ -86,6 +88,8 @@ class GeyeApplication(object):
                 self.MessageQueues.SAVE_TASK_QUEUE = queue.PriorityQueue(maxsize=save_queue_size)
             if "monitor_task_queue" in queues:
                 self.MessageQueues.MONITOR_TASK_QUEUE = queue.PriorityQueue(maxsize=monitor_queue_size)
+            if "monitor_save_queue" in queues:
+                self.MessageQueues.MONITOR_SAVE_QUEUE = queue.PriorityQueue(maxsize=monitor_save_queue_size)
 
     def __init_engines(self, engines: Optional[List[str]]):
         """初始化所需的engine"""
