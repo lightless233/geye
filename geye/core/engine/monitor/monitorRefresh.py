@@ -49,6 +49,7 @@ class MonitorRefreshEngine(SingleThreadEngine):
                         "task_type": _row.task_type,
                         "event_type": _row.event_type,
                         "rule_content": _row.rule_content,
+                        "rule_id": _row.id,
                     })
                     logger.debug("Create monitor task: {task}".format(task=task))
                     while self.__running():

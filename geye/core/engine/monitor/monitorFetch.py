@@ -315,12 +315,14 @@ class MonitorEngine(MultiThreadEngine):
             #     "task_type": _row.task_type, # 可选值来自 MonitorTaskTypeConstant，监控的维度
             #     "event_type": _row.event_type, # 可选值来自MonitorEventTypeConstant，监控的事件类型，多个值用逗号分隔
             #     "rule_content": _row.rule_content, # 根据task_type有不同含义
+            #     "rule_id": _row.id,
             # }
             logger.debug("get task: {}".format(task))
             task_type = task.get("task_type", None)
             event_type: str = task.get("event_type", None)
             rule_content = task.get("rule_content", None)
-            if not task_type or not event_type or not rule_content:
+            monitor_rule_id = task.get("rule_id", None)
+            if not task_type or not event_type or not rule_content or not monitor_rule_id:
                 self.__wait(1)
                 continue
 
@@ -351,6 +353,9 @@ class MonitorEngine(MultiThreadEngine):
                 continue
             else:
                 # 把数据扔到队列里去，把event存起来
-                self.__put_task(task_priority, parse_result.get("data"))
+                self.__put_task(task_priority, {
+                    "data": parse_result.get("data"),
+                    "monitor_rule_id": monitor_rule_id,
+                })
 
         logger.info("{name} stop!".format(name=self.name))
