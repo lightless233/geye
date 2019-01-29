@@ -185,6 +185,8 @@ class EventParser:
                 logger.error("Unknown EventType: {}".format(e_type))
                 continue
 
+        retval["success"] = True
+        retval["message"] = "No Error"
         return retval
 
 

@@ -64,8 +64,8 @@
             <el-form-item label="事件类型">
               <el-select multiple v-model="dialogAttrs.form.eventType" :value="dialogAttrs.form.eventType"
                          style="width: 100%">
-                <el-option key="push_event" value="push_event" label="PushEvent"></el-option>
-                <el-option key="release_event" value="release_event" label="ReleaseEvent"></el-option>
+                <el-option key="push_event" value="PushEvent" label="PushEvent"></el-option>
+                <el-option key="release_event" value="ReleaseEvent" label="ReleaseEvent"></el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -91,13 +91,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="刷新间隔">
+            <el-form-item label="刷新间隔(分钟)">
               <el-input v-model="dialogAttrs.form.interval" style="width: 100%"
                         autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="优先级(分钟)">
+            <el-form-item label="优先级">
               <el-input v-model="dialogAttrs.form.priority" style="width: 100%"
                         autocomplete="off"></el-input>
             </el-form-item>
@@ -189,9 +189,9 @@
         let return_val = Array();
 
         for (let i = 0; i < val.length; i++) {
-          if (val[i] === "push_event") {
+          if (val[i] === "PushEvent") {
             return_val.push("PushEvent");
-          } else if (val[i] === "release_event") {
+          } else if (val[i] === "ReleaseEvent") {
             return_val.push("ReleaseEvent");
           } else {
             return "未知";
