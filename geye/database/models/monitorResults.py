@@ -19,7 +19,8 @@ from .base import GeyeBaseModel
 
 
 class MonitorResultsManager(models.Manager):
-    pass
+    def is_exist_by_event_id(self, event_id):
+        return self.filter(is_deleted=0, event_id=event_id).first()
 
 
 class GeyeMonitorResultsModel(GeyeBaseModel):

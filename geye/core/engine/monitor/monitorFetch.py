@@ -201,7 +201,7 @@ class MonitorEngine(MultiThreadEngine):
 
         # 获取队列信息
         self._monitor_task_queue = self.app_ctx.MessageQueues.MONITOR_TASK_QUEUE
-        self._monitor_result_queue = None
+        self._monitor_result_queue = self.app_ctx.MessageQueues.MONITOR_SAVE_QUEUE
 
     def __is_running(self):
         # 返回当前engine是否在运行中

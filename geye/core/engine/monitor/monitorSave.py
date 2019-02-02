@@ -79,9 +79,18 @@ class MonitorSaveEngine(SingleThreadEngine):
 
             dataset = task.get("data")
             for item in dataset:
+
+                e_id = item.get("event_id")
+                if not e_id:
+                    continue
+
+                # 检查event_id是否已经存在了
+                if GeyeMonitorResultsModel.instance.is_exist_by_event_id(event_id=e_id):
+                    continue
+
                 monitor_results = GeyeMonitorResultsModel()
                 monitor_results.monitor_rule_id = monitor_rule_id
-                monitor_results.event_id = item.get("event_id")
+                monitor_results.event_id = e_id
                 monitor_results.event_type = item.get("event_type")
 
                 monitor_results.actor_url = item.get("actor_url")

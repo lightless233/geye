@@ -182,3 +182,4 @@ geye/config/dev.py
 .idea
 geye-fe/src/config/index.js
 conf/gunicorn_config.py
+logs/*.log*

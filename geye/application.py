@@ -19,7 +19,7 @@ from typing import Union, Optional, List
 from django.conf import settings
 
 from geye.core.engine import RefreshEngine, SearchEngine, FilterEngine, SaveEngine
-from geye.core.engine.monitor import MonitorRefreshEngine, MonitorEngine
+from geye.core.engine.monitor import MonitorRefreshEngine, MonitorEngine, MonitorSaveEngine
 from geye.utils.log import logger
 
 
@@ -32,6 +32,7 @@ class GeyeApplication(object):
         SAVE_ENGINE: SaveEngine = None
         MONITOR_REFRESH_ENGINE: MonitorRefreshEngine = None
         MONITOR_ENGINE: MonitorEngine = None
+        MONITOR_SAVE_ENGINE: MonitorSaveEngine = None
 
     class MessageQueues:
         """存储所有的消息队列"""
@@ -63,6 +64,7 @@ class GeyeApplication(object):
         self.Engines.SAVE_ENGINE.stop()
         self.Engines.MONITOR_REFRESH_ENGINE.stop()
         self.Engines.MONITOR_ENGINE.stop()
+        self.Engines.MONITOR_SAVE_ENGINE.stop()
 
     def __init_queues(self, queues: Optional[List[str]]):
         """初始化程序运行所需的队列"""
@@ -78,6 +80,7 @@ class GeyeApplication(object):
             self.MessageQueues.FILTER_TASK_QUEUE = queue.PriorityQueue(maxsize=filter_queue_size)
             self.MessageQueues.SAVE_TASK_QUEUE = queue.PriorityQueue(maxsize=save_queue_size)
             self.MessageQueues.MONITOR_TASK_QUEUE = queue.PriorityQueue(maxsize=monitor_queue_size)
+            self.MessageQueues.MONITOR_SAVE_QUEUE = queue.PriorityQueue(maxsize=monitor_save_queue_size)
         else:
             # 启动指定的队列
             if "search_task_queue" in queues:
@@ -106,7 +109,10 @@ class GeyeApplication(object):
             self.Engines.REFRESH_ENGINE = RefreshEngine(app_ctx=self, name="RefreshEngine")
             self.Engines.REFRESH_ENGINE.start()
 
-            self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorEngine")
+            self.Engines.MONITOR_SAVE_ENGINE = MonitorSaveEngine(app_ctx=self, name="MonitorSaveEngine")
+            self.Engines.MONITOR_SAVE_ENGINE.start()
+
+            self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorFetchEngine")
             self.Engines.MONITOR_ENGINE.start()
 
             self.Engines.MONITOR_REFRESH_ENGINE = MonitorRefreshEngine(app_ctx=self, name="MonitorRefreshEngine")
