@@ -35,12 +35,6 @@ const routerConf = [
   },
 
   {
-    path: "/rule/special-monitor",
-    component: resolve => require(["../components/SpecialMonitor.vue"], resolve),
-    name: "special-monitor",
-  },
-
-  {
     path: "/handleCenter/search",
     component: resolve => require(["@/components/handleCenter/SearchCenter.vue"], resolve),
     name: "handle-center-search",
@@ -56,6 +50,17 @@ const routerConf = [
     path: "/leaks",
     component: resolve => require(["@/components/leaks.vue"], resolve),
     name: "leaks",
+  },
+
+  // monitor 部分的路由
+  {
+    path: "/monitor/rules", name: "all-monitor-rules",
+    component: resolve => require(["@/components/monitor/all.vue"], resolve),
+  },
+
+  {
+    path: "/handleCenter/monitor", name: "monitor-results",
+    component: resolve => require(["@/components/handleCenter/MonitorCenter.vue"], resolve)
   },
 
   {

@@ -1,7 +1,7 @@
 <template>
   <div class="main-div" v-loading="loading">
     <div v-if="items.length">
-      <search-result-item v-for="item in items" :item="item"></search-result-item>
+      <search-result-item v-for="item in items" :item="item" :key="item.id"></search-result-item>
       <div align="center">
         <el-button type="primary" style="width: 100%" align="center" @click="handleLoadMore">加载更多</el-button>
       </div>

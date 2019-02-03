@@ -24,7 +24,7 @@ import requests
 from django.conf import settings
 
 from geye.database.models import GeyeTokenModel
-from geye.utils.datatype import PriorityTask, AttribDict
+from geye.utils.datatype import PriorityTask
 from .base import MultiThreadEngine
 from geye.utils.log import logger
 
@@ -55,7 +55,7 @@ class SearchEngine(MultiThreadEngine):
         从队列中获取任务，并且解析出真正的内容
         :return: tuple (优先级, 任务数据dict)
         """
-        while self.status == self.EngineStatus.RUNNING:
+        while self.is_running():
             try:
                 task: PriorityTask = self.search_task_queue.get_nowait()
                 return task.priority, task.data
@@ -72,6 +72,7 @@ class SearchEngine(MultiThreadEngine):
                 self.filter_task_queue.put_nowait(task)
                 break
             except queue.Full:
+                logger.warning("FilterTask队列已满，1秒后重试.")
                 self.ev.wait(1)
                 continue
 
@@ -108,7 +109,6 @@ class SearchEngine(MultiThreadEngine):
         发出搜索请求
         :param header: 请求的header，包括token等信息
         :param data: 搜索的内容
-        todo: 增加失败次数，防止一直都进行重复请求
         """
 
         # 获取代理设置信息
@@ -118,15 +118,17 @@ class SearchEngine(MultiThreadEngine):
         # todo：先写死到代码里，计划移植到配置中
         request_cnt = 0
 
-        while self.status == self.EngineStatus.RUNNING:
+        while self.is_running():
             try:
                 request_cnt += 1
                 if request_cnt == 5:
                     logger.warning("请求超出最大次数!")
                     break
+                logger.debug("before requests.get()")
                 response = requests.get(
                     self.search_api_url, params=data, headers=header, timeout=12, proxies=proxies
                 )
+                logger.debug("after requests.get()")
                 return response
             except requests.RequestException as e:
                 logger.error("Error while make request. requests.RequestException: {}".format(e))
@@ -149,7 +151,7 @@ class SearchEngine(MultiThreadEngine):
         token_id = request_header["token_id"]
         header = request_header["header"]
 
-        while self.status == self.EngineStatus.RUNNING:
+        while self.is_running():
             # make_request会循环请求5次，如果超过该次数还请求失败，则会返回None
             response: Optional[requests.Response] = self.make_request(header, request_data)
 
@@ -263,31 +265,33 @@ class SearchEngine(MultiThreadEngine):
         current_name = threading.current_thread().name
         logger.info("{} start!".format(current_name))
 
-        while self.status == self.EngineStatus.RUNNING:
-            # 获取任务信息
+        while self.is_running():
+            # 获取任务信息，没有取到就继续循环
             task_priority, search_task = self.get_task_from_queue()
             if not task_priority or not search_task:
                 continue
 
+            # 解析数据内容
             srid = search_task.get("search_rule_id")
             rule_name = search_task.get("search_rule_name")
             rule_content = search_task.get("search_rule_content")
+            logger.debug("parse task data done.")
 
             # 循环请求每一页
             for page_num in range(1, self.search_page_max_size + 1):
+                # 构建请求数据
                 request_data = self.build_request_data(rule_content, page_num)
                 request_header = self.build_request_header()
                 if request_header is None:
                     logger.error("No available token found. Jumping search operator.")
                     break
 
-                result = self._request_page(request_header, request_data)
-                # 如果response为None，说明收到了结束信号，直接break
-                if result is None:
+                # 发起请求，如果response为None，说明收到了结束信号，直接break
+                response = self._request_page(request_header, request_data)
+                if response is None:
                     break
-                else:
-                    response = result
                 logger.debug("response.text: {}".format(response.text))
+
                 # logger.debug("response header: {}".format(response.headers))
                 # 正常内容 开始解析内容
                 # return_val = {

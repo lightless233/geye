@@ -62,6 +62,7 @@ class RefreshEngine(SingleThreadEngine):
                             refresh_task_queue.put_nowait(task)
                             break
                         except queue.Full:
+                            logger.warning("SearchTask队列已满，等待3秒后重试")
                             self.ev.wait(3)
                             continue
 

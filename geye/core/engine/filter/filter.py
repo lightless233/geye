@@ -94,13 +94,17 @@ class FilterEngine(MultiThreadEngine):
         else:
             proxies = None
 
-        # 发出请求
-        try:
-            response = requests.get(raw_code_url, timeout=15, proxies=proxies)
-            result["code"] = response.text
-            result["success"] = True
-        except requests.RequestException as e:
-            logger.error("Error while get raw code. Will re-put filter task to queue. URL: {}. error: {}".format(raw_code_url, e))
+        # 一共请求5次
+        retries = 5
+        while retries:
+            retries -= 1
+            # 发出请求
+            try:
+                response = requests.get(raw_code_url, timeout=15, proxies=proxies)
+                result["code"] = response.text
+                result["success"] = True
+            except requests.RequestException as e:
+                logger.error("Error while get raw code. Will re-put filter task to queue. URL: {}. error: {}".format(raw_code_url, e))
 
         return result
 
@@ -118,6 +122,12 @@ class FilterEngine(MultiThreadEngine):
                 target_queue.put_nowait(PriorityTask(task[0], task[1]))
                 break
             except queue.Full:
+                # get queue name
+                q_name = "unknown"
+                for k, v in self.__dict__.items():
+                    if v is target_queue:
+                        q_name = k
+                logger.debug("{q_name}已满，1秒后重试.".format(q_name=q_name))
                 self.ev.wait(1)
                 continue
 
@@ -230,8 +240,9 @@ class FilterEngine(MultiThreadEngine):
             if not response_result["success"]:
                 # 失败了，把任务重新放回队列
                 # 这里可能导致worker卡死
-                self.put_task_to_queue(target_queue=self.filter_task_queue, task=(task_priority, task))
-                logger.debug("Re-put done. continue.")
+                # self.put_task_to_queue(target_queue=self.filter_task_queue, task=(task_priority, task))
+                # logger.debug("Re-put done. continue.")
+                logger.error("获取raw code失败，URL：{url}".format(url=task["full_code_url"]))
                 continue
             raw_code = response_result["code"]
 

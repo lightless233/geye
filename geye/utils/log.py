@@ -34,6 +34,17 @@ STDOUT_LOG_FMT = "%(log_color)s[%(asctime)s] [%(levelname)s] [%(threadName)s] [%
 STDOUT_DATE_FMT = "%Y-%m-%d %H:%M:%S"
 FILE_LOG_FMT = "[%(asctime)s] [%(levelname)s] [%(threadName)s] [%(filename)s:%(lineno)d] %(message)s"
 FILE_DATE_FMT = "%Y-%m-%d %H:%M:%S"
+
+# 不同日志级别对用的文件名suffix
+LEVEL_SUFFIX = {
+    "debug": ".DEBUG",
+    "info": ".INFO",
+    "warning": ".WARNING",
+    "error": ".ERROR",
+    "critical": ".CRITICAL",
+    "all": ".ALL",
+}
+
 # 用户配置部分 ↑
 
 
@@ -98,6 +109,95 @@ class ColoredFormatter(logging.Formatter):
         return message
 
 
+class FileLoggerFilter(logging.Filter):
+    """
+    用来过滤输出到文件中的日志
+    只有当当期的日志级别和指定的级别一致时，才输出
+    """
+    def __init__(self, level: str):
+        super(FileLoggerFilter, self).__init__()
+        self.level = level.upper()
+
+    def filter(self, record: logging.LogRecord):
+        """
+        Is the specified record to be logged? Returns zero for no, nonzero for yes.
+        :param record:
+        :return:
+        """
+        if self.level == "all":
+            return True
+        else:
+            return record.levelname == self.level
+
+
+class GeyeLogger:
+    def __init__(self, log_filename: str = None, log_level: str = "DEBUG"):
+        super(GeyeLogger, self).__init__()
+        if not log_filename:
+            self.log_filename = settings.LOG_FILENAME
+        else:
+            self.log_filename = log_filename
+
+        # 用于输出到stream中的logger
+        self._stream_logger = logging.getLogger(__name__)
+
+        # 输出到文件的logger
+        self._file_loggers = {
+            "all": logging.getLogger("{}.{}".format(__name__, "_ALL")),
+            "info": logging.getLogger("{}.{}".format(__name__, "_INFO")),
+            "debug": logging.getLogger("{}.{}".format(__name__, "_DEBUG")),
+            "error": logging.getLogger("{}.{}".format(__name__, "_ERROR")),
+            "critical": logging.getLogger("{}.{}".format(__name__, "_CRITICAL")),
+        }
+
+        # 为输出到stream的logger添加formatter
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(
+            ColoredFormatter(fmt=STDOUT_LOG_FMT, datefmt=STDOUT_DATE_FMT)
+        )
+        self._stream_logger.addHandler(stream_handler)
+
+        # stream logger 设置日志级别
+        self._stream_logger.setLevel(log_level)
+
+        # 检查指定的日志目录是否存在，如果不存在就先创建目录
+        log_path = settings.LOG_PATH
+        if not os.path.exists(log_path):
+            os.mkdir(log_path)
+        # full_log_filename = os.path.join(log_path, log_filename)
+
+        # 为输出到文件中的logger添加formatter
+        for level, f_logger in self._file_loggers.items():
+            # 生成完整的log文件路径
+            full_log_filename = os.path.join(log_path, self.log_filename)
+            full_log_filename += LEVEL_SUFFIX[level]
+
+            # 添加formatter，设置rotating
+            file_formatter = logging.Formatter(fmt=FILE_LOG_FMT, datefmt=FILE_DATE_FMT)
+            file_handler = logging.handlers.TimedRotatingFileHandler(full_log_filename, when="midnight", backupCount=15)
+            file_handler.setFormatter(file_formatter)
+            f_logger.addHandler(file_handler)
+
+            # 添加filter
+            f = FileLoggerFilter(level)
+            f_logger.addFilter(f)
+
+            # 设置日志级别
+            f_logger.setLevel(log_level)
+
+    def info(self, msg, *args, **kwargs):
+        return self._file_loggers["info"].info(msg, *args, **kwargs)
+
+    def debug(self, msg, *args, **kwargs):
+        return self._file_loggers["debug"].info(msg, *args, **kwargs)
+
+    def error(self, msg, *args, **kwargs):
+        return self._file_loggers["error"].info(msg, *args, **kwargs)
+
+    def critical(self, msg, *args, **kwargs):
+        return self._file_loggers["critical"].info(msg, *args, **kwargs)
+
+
 def get_logger(log_to_file=True, log_filename="default.log", log_level="DEBUG"):
 
     _logger = logging.getLogger(__name__)
@@ -112,16 +212,15 @@ def get_logger(log_to_file=True, log_filename="default.log", log_level="DEBUG"):
     _logger.addHandler(stdout_handler)
 
     if log_to_file:
+        # 检查指定的日志目录是否存在，如果不存在就先创建目录
         _tmp_path = settings.LOG_PATH
         if not os.path.exists(_tmp_path):
             os.mkdir(_tmp_path)
         _tmp_path = os.path.join(_tmp_path, log_filename)
 
+        # 写文件的handler
+        file_formatter = logging.Formatter(fmt=FILE_LOG_FMT, datefmt=FILE_DATE_FMT)
         file_handler = logging.handlers.TimedRotatingFileHandler(_tmp_path, when="midnight", backupCount=15)
-        file_formatter = logging.Formatter(
-            fmt=FILE_LOG_FMT,
-            datefmt=FILE_DATE_FMT,
-        )
         file_handler.setFormatter(file_formatter)
         _logger.addHandler(file_handler)
 
@@ -130,3 +229,4 @@ def get_logger(log_to_file=True, log_filename="default.log", log_level="DEBUG"):
 
 
 logger = get_logger(log_to_file=settings.LOG_TO_FILE, log_filename=settings.LOG_FILENAME)
+# logger = GeyeLogger(settings.LOG_FILENAME)

@@ -19,6 +19,7 @@ from typing import Union, Optional, List
 from django.conf import settings
 
 from geye.core.engine import RefreshEngine, SearchEngine, FilterEngine, SaveEngine
+from geye.core.engine.monitor import MonitorRefreshEngine, MonitorEngine, MonitorSaveEngine
 from geye.utils.log import logger
 
 
@@ -29,6 +30,9 @@ class GeyeApplication(object):
         SEARCH_ENGINE: SearchEngine = None
         FILTER_ENGINE: FilterEngine = None
         SAVE_ENGINE: SaveEngine = None
+        MONITOR_REFRESH_ENGINE: MonitorRefreshEngine = None
+        MONITOR_ENGINE: MonitorEngine = None
+        MONITOR_SAVE_ENGINE: MonitorSaveEngine = None
 
     class MessageQueues:
         """存储所有的消息队列"""
@@ -41,30 +45,42 @@ class GeyeApplication(object):
         # 存储所有的持久化任务
         SAVE_TASK_QUEUE: queue.PriorityQueue = None
 
+        # 存储MonitorTask的queue
+        MONITOR_TASK_QUEUE: queue.PriorityQueue = None
+        MONITOR_SAVE_QUEUE: queue.PriorityQueue = None
+
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
         # run_mode 有两种，分别是server 和 agent
         self.run_mode = run_mode
 
     def __sigint_signal_handler(self, sig, frame):
+        """处理 CTRL+C 信号"""
         logger.info("Receive exit signal.")
 
         self.Engines.REFRESH_ENGINE.stop()
         self.Engines.SEARCH_ENGINE.stop()
         self.Engines.FILTER_ENGINE.stop()
         self.Engines.SAVE_ENGINE.stop()
+        self.Engines.MONITOR_REFRESH_ENGINE.stop()
+        self.Engines.MONITOR_ENGINE.stop()
+        self.Engines.MONITOR_SAVE_ENGINE.stop()
 
     def __init_queues(self, queues: Optional[List[str]]):
-
-        search_queue_size = settings.SEARCH_TASK_QUEUE_SIZE
-        filter_queue_size = settings.FILTER_TASK_QUEUE_SIZE
-        save_queue_size = settings.SAVE_TASK_QUEUE_SIZE
+        """初始化程序运行所需的队列"""
+        search_queue_size = settings.SEARCH_TASK_QUEUE_SIZE or 1024
+        filter_queue_size = settings.FILTER_TASK_QUEUE_SIZE or 1024
+        save_queue_size = settings.SAVE_TASK_QUEUE_SIZE or 1024
+        monitor_queue_size = settings.MONITOR_TASK_QUEUE_SIZE or 1024
+        monitor_save_queue_size = settings.MONITOR_SAVE_QUEUE_SIZE or 1024
 
         if queues is None:
             # 启动所有队列
             self.MessageQueues.SEARCH_TASK_QUEUE = queue.PriorityQueue(maxsize=search_queue_size)
             self.MessageQueues.FILTER_TASK_QUEUE = queue.PriorityQueue(maxsize=filter_queue_size)
             self.MessageQueues.SAVE_TASK_QUEUE = queue.PriorityQueue(maxsize=save_queue_size)
+            self.MessageQueues.MONITOR_TASK_QUEUE = queue.PriorityQueue(maxsize=monitor_queue_size)
+            self.MessageQueues.MONITOR_SAVE_QUEUE = queue.PriorityQueue(maxsize=monitor_save_queue_size)
         else:
             # 启动指定的队列
             if "search_task_queue" in queues:
@@ -73,8 +89,13 @@ class GeyeApplication(object):
                 self.MessageQueues.FILTER_TASK_QUEUE = queue.PriorityQueue(maxsize=filter_queue_size)
             if "save_task_queue" in queues:
                 self.MessageQueues.SAVE_TASK_QUEUE = queue.PriorityQueue(maxsize=save_queue_size)
+            if "monitor_task_queue" in queues:
+                self.MessageQueues.MONITOR_TASK_QUEUE = queue.PriorityQueue(maxsize=monitor_queue_size)
+            if "monitor_save_queue" in queues:
+                self.MessageQueues.MONITOR_SAVE_QUEUE = queue.PriorityQueue(maxsize=monitor_save_queue_size)
 
     def __init_engines(self, engines: Optional[List[str]]):
+        """初始化所需的engine"""
         if engines is None:
             self.Engines.SAVE_ENGINE = SaveEngine(app_ctx=self, name="SaveEngine")
             self.Engines.SAVE_ENGINE.start()
@@ -87,6 +108,15 @@ class GeyeApplication(object):
 
             self.Engines.REFRESH_ENGINE = RefreshEngine(app_ctx=self, name="RefreshEngine")
             self.Engines.REFRESH_ENGINE.start()
+
+            self.Engines.MONITOR_SAVE_ENGINE = MonitorSaveEngine(app_ctx=self, name="MonitorSaveEngine")
+            self.Engines.MONITOR_SAVE_ENGINE.start()
+
+            self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorFetchEngine")
+            self.Engines.MONITOR_ENGINE.start()
+
+            self.Engines.MONITOR_REFRESH_ENGINE = MonitorRefreshEngine(app_ctx=self, name="MonitorRefreshEngine")
+            self.Engines.MONITOR_REFRESH_ENGINE.start()
         else:
             if "save_engine" in engines:
                 self.Engines.SAVE_ENGINE = SaveEngine(app_ctx=self, name="SaveEngine")
@@ -100,8 +130,14 @@ class GeyeApplication(object):
             if "refresh_engine" in engines:
                 self.Engines.REFRESH_ENGINE = RefreshEngine(app_ctx=self, name="RefreshEngine")
                 self.Engines.REFRESH_ENGINE.start()
+            if "monitor_refresh_engine" in engines:
+                self.Engines.MONITOR_REFRESH_ENGINE = MonitorRefreshEngine(app_ctx=self, name="MonitorRefreshEngine")
+                self.Engines.MONITOR_REFRESH_ENGINE.start()
+            if "monitor_engine" in engines:
+                self.Engines.MONITOR_ENGINE = MonitorEngine(app_ctx=self, name="MonitorEngine")
+                self.Engines.MONITOR_ENGINE.start()
 
-    def start(self):
+    def start(self, queues=None, engines=None):
 
         # 注册CTRL+C处理器
         signal.signal(signal.SIGINT, self.__sigint_signal_handler)
@@ -117,5 +153,8 @@ class GeyeApplication(object):
             # 单机模式启动，启动自己的队列和全部engine
             self.__init_queues(queues=None)
             self.__init_engines(engines=None)
+        elif run_mode == "test":
+            self.__init_queues(queues=queues)
+            self.__init_engines(engines=engines)
         else:
             raise RuntimeError("错误的启动参数! 不支持: {}".format(run_mode))
