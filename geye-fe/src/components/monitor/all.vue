@@ -62,8 +62,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="事件类型">
-              <el-select multiple v-model="dialogAttrs.form.eventType" :value="dialogAttrs.form.eventType"
-                         style="width: 100%">
+              <el-select multiple v-model="dialogAttrs.form.eventType" style="width: 100%" :value="dialogAttrs.form.eventType">
                 <el-option key="push_event" value="PushEvent" label="PushEvent"></el-option>
                 <el-option key="release_event" value="ReleaseEvent" label="ReleaseEvent"></el-option>
               </el-select>
@@ -83,7 +82,7 @@
 
         <el-row>
           <el-col :span="8">
-            <el-form-item label="状态">
+            <el-form-item label="状态" label-width="120px">
               <el-select v-model="dialogAttrs.form.status" :value="1" style="width: 100%">
                 <el-option :value="1" label="开启"></el-option>
                 <el-option :value="0" label="关闭"></el-option>
@@ -91,13 +90,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="刷新间隔(分钟)">
+            <el-form-item label="刷新间隔(min)" label-width="120px">
               <el-input v-model="dialogAttrs.form.interval" style="width: 100%"
                         autocomplete="off"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="优先级">
+            <el-form-item label="优先级" label-width="120px">
               <el-input v-model="dialogAttrs.form.priority" style="width: 100%"
                         autocomplete="off"></el-input>
             </el-form-item>
@@ -134,7 +133,7 @@
           form: {
             id: null,
             taskType: null,
-            eventType: null,
+            eventType: [],
             ruleContent: null,
             status: 1,
             interval: 5,
@@ -202,7 +201,7 @@
       },
       clearForm: function () {
         this.dialogAttrs.form.taskType = null;
-        this.dialogAttrs.form.eventType = null;
+        this.dialogAttrs.form.eventType = [];
         this.dialogAttrs.form.ruleContent = null;
         this.dialogAttrs.form.status = 1;
         this.dialogAttrs.form.interval = 5;
@@ -268,7 +267,9 @@
               this.$message.success(msg);
 
               if (confirmType === "add") {
-                this.tableAttrs.dataset.push(resp.data.data);
+                let t = Object.assign({}, resp.data.data);
+                t["eventType"] = t["eventType"].split(",");
+                this.tableAttrs.dataset.push(t);
                 this.dialogAttrs.show = false;
                 this.clearForm();
 
