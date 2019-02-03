@@ -5,9 +5,9 @@ import config from "@/config/index";
 const BASE_API = config.BASE_API;
 const BASE_PATH = `${BASE_API}/api/v1/rule/monitor`;
 const API_LIST = {
-  "add": `${BASE_PATH}/new`,
-  "update": `${BASE_PATH}/update`,
-  "delete": `${BASE_PATH}/delete`,
+  add: `${BASE_PATH}/new`,
+  update: `${BASE_PATH}/update`,
+  delete: `${BASE_PATH}/delete`,
   all: `${BASE_PATH}/all`,
 };
 

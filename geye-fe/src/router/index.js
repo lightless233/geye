@@ -59,6 +59,11 @@ const routerConf = [
   },
 
   {
+    path: "/handleCenter/monitor", name: "monitor-results",
+    component: resolve => require(["@/components/handleCenter/MonitorCenter.vue"], resolve)
+  },
+
+  {
     path: "/*",
     component: resolve => require(["../components/404.vue"], resolve),
   }

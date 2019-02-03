@@ -17,7 +17,7 @@ from django.urls import path
 from geye.web.controller.leaks import leaks
 from .controller.rule import search, filter, globalFilter, monitor
 from .controller.token import token
-from .controller.handleCenter import searchResults
+from .controller.handleCenter import searchResults, monitorResults
 
 
 # 总的路由
@@ -70,4 +70,7 @@ urlpatterns = [
     path("v1/rule/monitor/update", monitor.UpdateMonitorRuleView.as_view()),
     path("v1/rule/monitor/delete", monitor.DeleteMonitorRuleView.as_view()),
     path("v1/rule/monitor/all", monitor.MonitorRulesView.as_view()),
+
+    # monitor results router
+    path("v1/results/monitor/all", monitorResults.AllMonitorResults.as_view()),
 ]
