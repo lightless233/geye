@@ -21,7 +21,7 @@ from geye.database.models import GeyeMonitorResultsModel
 
 
 class AllMonitorResults(View):
-    PAGE_SIZE = 20
+    PAGE_SIZE = 15
 
     def get(self, request):
         page = request.GET.get("page", 1)
@@ -29,14 +29,16 @@ class AllMonitorResults(View):
         start_id = (page - 1) * self.PAGE_SIZE
         end_id = start_id + self.PAGE_SIZE
 
-        # 查询所有的数据
-        rows: List[GeyeMonitorResultsModel] = GeyeMonitorResultsModel.instance.filter(is_deleted=0).order_by("-event_created_time")[start_id:end_id]
+        sql = GeyeMonitorResultsModel.instance.filter(is_deleted=0)
 
+        # 数据总量
+        total_count = sql.count()
+
+        # 查询所有的数据
+        rows: List[GeyeMonitorResultsModel] = sql.order_by("-event_created_time")[start_id:end_id]
         return_data = []
         for row in rows:
-
             event_created_time = row.event_created_time.strftime("%Y-%m-%d %H:%M:%S")
-
             return_data.append({
                 "monitor_rule_id": row.monitor_rule_id,
                 "event_id": row.event_id,
@@ -53,4 +55,4 @@ class AllMonitorResults(View):
                 "id": row.id,
             })
 
-        return JsonResponse({"code": 1001, "message": "获取成功!", "data": return_data})
+        return JsonResponse({"code": 1001, "message": "获取成功!", "data": return_data, "total_count": total_count})

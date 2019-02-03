@@ -9,7 +9,10 @@ const API_LIST = {
 };
 
 export default {
-    getALlMonitorResult(context) {
-        return context.axios.get(API_LIST.all);
+    getALlMonitorResult(context, val) {
+        let data = {
+            page: val,
+        };
+        return context.axios.get(API_LIST.all, {params: data});
     }
 }
