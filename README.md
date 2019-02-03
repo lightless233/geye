@@ -10,7 +10,8 @@
 - 方便的管理界面，快速打标处理
 - 强大的规则系统，满足各种复杂搜索、过滤规则
 
-![](https://raw.githubusercontent.com/redstone-project/geye/develop/docs/img/geye.png)
+![searchResult](https://raw.githubusercontent.com/redstone-project/geye/develop/docs/img/geye.png)
+![monitorResult](https://raw.githubusercontent.com/redstone-project/geye/develop/docs/img/geye-monitor-results.png)
 
 # 安装及快速开始
 ### 1. 部署需求
@@ -39,6 +40,9 @@ $ pip install "gunicorn[tornado]"
 
 ```bash
 # 如果用于生产环境，请将dev.py修改为prod.py，预发环境请使用pre.py
+# 并同时设置对应的环境变量GEYE_ENV，例如生产环境：
+# export GEYE_ENV="prod"
+# 如果不设置，默认为dev环境启动
 (venv) $ cp ./geye/config/example.py ./geye/config/dev.py 
 # ！！！1. 修改文件中的DEBUG开关以及SECRET_KEY！！！
 # ！！！2. 配置pgsql的相关内容！！！
@@ -66,8 +70,9 @@ $ nginx -t && nginx -s reload
 ```
 
 #### 2.4 部署引擎
-> 编辑中...
-
+```bash
+(venv) $ python manage.py run --single 
+```
 #### 2.5 大功告成
 Enjoy It!
 
