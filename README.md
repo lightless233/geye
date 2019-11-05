@@ -5,6 +5,7 @@
 > 开箱即用！🚀🚀🚀
 
 # 特性
+- 设计说明：https://lightless.me/archives/How-To-Designing-A-Faster-Than-Faster-GitHub-Monitoring-System.html
 - 开箱即用
 - 基于GitHub API进行信息收集，快于大部分产品
 - 方便的管理界面，快速打标处理
