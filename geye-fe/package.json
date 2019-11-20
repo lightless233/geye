@@ -13,7 +13,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.4.2",
     "@fortawesome/free-solid-svg-icons": "^5.4.2",
     "@fortawesome/vue-fontawesome": "^0.1.2",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "element-ui": "^2.4.8",
     "eslint": "^5.9.0",
     "normalize.css": "^8.0.0",
