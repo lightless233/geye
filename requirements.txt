@@ -1,4 +1,4 @@
-django==2.1.11
+django==2.2.24
 psycopg2==2.7.5
 requests
 requests[socks]
