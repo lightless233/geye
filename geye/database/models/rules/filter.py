@@ -87,7 +87,7 @@ class GeyeFilterRuleModel(GeyeBaseModel):
     用于获取详细代码后二次匹配用到的filter规则
     Filter Rule
 
-﻿    name
+    name
         规则标题，用于区分这个规则是干啥的
     rule_type
         规则类型 1-正向匹配，2-反向匹配

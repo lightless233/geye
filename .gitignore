@@ -183,3 +183,5 @@ geye/config/dev.py
 geye-fe/src/config/index.js
 conf/gunicorn_config.py
 logs/*.log*
+geye/settings/settings_dev.py
+geye/settings/settings_prod.py
