@@ -27,7 +27,7 @@
 如果您不想使用虚拟环境管理，也可以直接安装。但是下面的安装方法会基于存在virtualenv的情况下进行说明的。
 
 ```bash
-$ git clone https://github.com/redstone-project/geye.git geye
+$ git clone https://github.com/lightless233/geye.git geye
 $ cd geye
 $ virtualenv -p python3 venv # 这里您可能需要指定您的python3.6.0及以上的解释器
 $ source ./venv/bin/activate
