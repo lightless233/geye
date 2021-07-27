@@ -1,11 +1,9 @@
 FROM python:3-buster
 EXPOSE 8000
 
-VOLUME /data
-
 # 复制代码到 docker 中
 WORKDIR /app
-COPY . /app/
+ADD . /app/
 
 # 安装 nodejs
 RUN sed -i 's#http://deb.debian.org#https://mirrors.aliyun.com#g' /etc/apt/sources.list && \

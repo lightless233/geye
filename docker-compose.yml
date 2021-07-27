@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  webapp:
+    build: .
+    ports: "7001:8000"
+    container_name: geye-web
+    volumes:
+      - ./run/web:/app
+    depends_on:
+      - db
+  db:
+    image: postgres:13-buster
+    restart: always
+    container_name: geye-db
+    volumes:
+      - ./run/db:/var/lib/postgresql/data
+    ports: "15432:5432"
+    environment:
+      - POSTGRES_PASSWORD: 123456
+      - POSTGRES_DB: geye
+      - POSTGRES_USER: geye
+
