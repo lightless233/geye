@@ -21,12 +21,11 @@ RUN ls /app/ && cd /app/geye-fe/ && npm i --registry https://registry.npm.taobao
     && npm run build
 
 # 安装Python的相关依赖
-RUN pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install "requests[socks]" "gunicorn[tornado]" -i https://pypi.tuna.tsinghua.edu.cn/simple
+RUN pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ && \
+    pip install "requests[socks]" "gunicorn[tornado]" -i https://mirrors.aliyun.com/pypi/simple/
 
 # 初始化DB
-RUN python manage.py migrate
+# RUN python manage.py migrate
 
 ENV PYTHONUNBUFFERED=1
-
-CMD cd /app/ && bash start_geye_in_docker.sh
+CMD cd /app/ && bash docker_entrypoint.sh

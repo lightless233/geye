@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 echo "========== Starting geye =========="
+echo "========== Apply database migrations =========="
+python manage.py migrate
 
 echo "========== Starting Web Service =========="
 gunicorn -c /app/geye/conf/gunicorn_config.py \
