@@ -6,6 +6,9 @@ mkdir -p logs/gunicorn
 echo "========== Apply database migrations =========="
 python manage.py migrate
 
+echo "========== starting nginx =========="
+nginx
+
 echo "========== Starting Web Service =========="
 gunicorn -c /app/conf/gunicorn_config.py \
   --env DJANGO_SETTINGS_MODULE=geye.settings \

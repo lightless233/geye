@@ -22,8 +22,8 @@ class VueMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        print(dir(request))
-        print(request.path)
+        # print(dir(request))
+        # print(request.path)
 
         if request.path.startswith("/api/"):
             return self.get_response(request)

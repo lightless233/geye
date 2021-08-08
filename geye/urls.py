@@ -15,15 +15,10 @@ Including another URLconf
 """
 from django.urls import path, include
 
-from geye.web.controller import index
 from geye.web.controller.system import csrf
 
 
 urlpatterns = [
-
-    # vue 路由
-    path("", index.IndexView.as_view()),
-    path("index", index.IndexView.as_view()),
 
     # CSRF Token 路由
     path("api/_csrf_token", csrf.CSRFTokenView.as_view()),

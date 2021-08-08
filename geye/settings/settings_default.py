@@ -18,7 +18,7 @@ from ._base import BASE_DIR
 
 INSTALLED_APPS = [
     'django.contrib.sessions',
-    'django.contrib.staticfiles',
+    # 'django.contrib.staticfiles',
     # geye app
     'geye.system',
     'geye.database',
@@ -31,7 +31,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "geye.system.middleware.CORSMiddleware",
-    "geye.system.middleware.VueMiddleware",
+    # "geye.system.middleware.VueMiddleware",
 ]
 
 ROOT_URLCONF = 'geye.urls'
@@ -60,9 +60,9 @@ USE_TZ = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-STATIC_URL = '/public/'
-STATICFILES_DIRS = [
-    BASE_DIR / "templates",
-]
+# STATIC_URL = '/public/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "templates",
+# ]
 
 CSRF_COOKIE_SAMESITE = None

@@ -178,7 +178,6 @@ pyvenv.cfg
 pip-selfcheck.json
 
 ### PROJECT'S FILE
-geye/config/dev.py
 .idea
 logs/*.log*
 geye/settings/settings_dev.py

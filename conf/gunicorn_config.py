@@ -21,7 +21,7 @@ _DEBUG = False
 
 
 # Web后端接口默认开到这个地址
-bind = "0.0.0.0:8000"
+bind = "127.0.0.1:8000"
 
 # workers
 # debug模式下只开启1个worker

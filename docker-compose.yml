@@ -16,7 +16,7 @@ services:
   webapp:
     build: .
     ports:
-      - "9123:8000"
+      - "9123:80"
     container_name: geye-web
     volumes:
       - ./run/web:/app/logs
