@@ -21,7 +21,7 @@ _DEBUG = False
 
 
 # Web后端接口默认开到这个地址
-bind = "127.0.0.1:8000"
+bind = "0.0.0.0:8000"
 
 # workers
 # debug模式下只开启1个worker
@@ -52,8 +52,8 @@ reload_engine = "auto"
 proc_name = "GeyeWeb"
 
 # 请求日志，错误日志，日志格式
-accesslog = "./geye/logs/gunicorn/access.log"
-errorlog = "./geye/logs/gunicorn/error.log"
+accesslog = "./logs/gunicorn/access.log"
+errorlog = "./logs/gunicorn/error.log"
 # remoteIP - 请求时间 请求行 状态码 返回值长度 "referer" "UA"
 access_log_format = '%(h)s %(l)s %(t)s %(r)s %(s)s %(b)s "%(f)s" "%(a)s"'
 loglevel = "debug" if _DEBUG else "info"
