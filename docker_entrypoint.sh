@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 echo "========== Starting geye =========="
+cd /app/
+mkdir -p logs/gunicorn
 echo "========== Apply database migrations =========="
 python manage.py migrate
 
 echo "========== Starting Web Service =========="
-gunicorn -c /app/geye/conf/gunicorn_config.py \
+gunicorn -c /app/conf/gunicorn_config.py \
   --env DJANGO_SETTINGS_MODULE=geye.settings \
   geye.wsgi
 

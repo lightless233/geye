@@ -7,8 +7,8 @@ services:
     container_name: geye-db
     volumes:
       - ./run/db:/var/lib/postgresql/data
-    ports:
-      - "15432:5432"
+#    ports:
+#      - "15432:5432"
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: geye
@@ -16,7 +16,7 @@ services:
   webapp:
     build: .
     ports:
-      - "7001:8000"
+      - "9123:8000"
     container_name: geye-web
     volumes:
       - ./run/web:/app/logs
@@ -27,4 +27,4 @@ services:
       DB_USER: geye
       DB_PASSWORD: 123456
       DB_HOST: db
-      DB_PORT: 15432
+      DB_PORT: 5432
