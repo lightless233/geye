@@ -69,7 +69,7 @@ REFRESH_INTERVAL = 60
 # 设置在爬取的时候是否使用代理
 # 如果需要代理，就在下面配置，配置多个代理的情况下
 # 每次会随机获取一个代理使用
-USE_SEARCH_PROXY = True
+USE_SEARCH_PROXY = False
 SEARCH_PROXIES = [
     {
         "http": "socks5://user:pass@host:port",
