@@ -29,7 +29,8 @@ workers = multiprocessing.cpu_count() * 2 + 1 if not _DEBUG else 1
 
 # worker class
 # worker进程的类型，你可能需要手动安装：pip install gunicorn[tornado]
-worker_class = "tornado"
+# worker_class = "tornado" 暂时不知道为啥不能用这个，先默认设置为 sync
+worker_class = "sync"
 
 # max_requests
 # 当worker进程每处理max_requests个请求后，会自动重启，如果为0，则表示永不重启

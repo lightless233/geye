@@ -3,10 +3,13 @@
 echo "========== Starting geye =========="
 cd /app/
 mkdir -p logs/gunicorn
+echo "wait for 10 seconds..."
+sleep 10
 echo "========== Apply database migrations =========="
 python manage.py migrate
 
 echo "========== starting nginx =========="
+rm /etc/nginx/sites-enabled/default
 nginx
 
 echo "========== Starting Web Service =========="
