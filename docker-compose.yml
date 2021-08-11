@@ -28,3 +28,5 @@ services:
       DB_PASSWORD: 123456
       DB_HOST: db
       DB_PORT: 5432
+      # prod: 生产，dev：开发
+      GEYE_ENV: prod

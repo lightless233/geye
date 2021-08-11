@@ -16,8 +16,9 @@ import os
 
 from .settings_default import *
 
-
 if os.environ.get("GEYE_ENV") == "prod":
     from .settings_prod import *
+elif os.environ.get("GEYE_ENV") == "dev":
+    from .settings_dev import *
 else:
     from .settings_dev import *
