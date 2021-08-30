@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "========== Starting geye =========="
-cd /app/
+cd /app/ || (echo "/app/ not exist!" && exit)
 mkdir -p logs/gunicorn
 echo "wait for 10 seconds..."
 sleep 10
