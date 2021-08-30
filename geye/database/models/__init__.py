@@ -14,7 +14,8 @@
 """
 
 from .leaks import GeyeLeaksModel, LeaksStatusConstant
-from .token import GeyeTokenModel
-from .rules import GeyeSearchRuleModel, GeyeFilterRuleModel
 from .monitorResults import GeyeMonitorResultsModel
 from .monitorRules import GeyeMonitorRules
+from .rules import GeyeSearchRuleModel, GeyeFilterRuleModel
+from .token import GeyeTokenModel
+from .user import GeyeUserModel
