@@ -49,6 +49,9 @@ class GeyeApplication(object):
         MONITOR_TASK_QUEUE: queue.PriorityQueue = None
         MONITOR_SAVE_QUEUE: queue.PriorityQueue = None
 
+        # 存储语雀监控任务相关的队列
+        YUQUE_TASK_QUEUE: queue.PriorityQueue = None
+
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
         # run_mode 有两种，分别是server 和 agent
