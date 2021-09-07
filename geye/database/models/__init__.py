@@ -19,3 +19,5 @@ from .monitorRules import GeyeMonitorRules
 from .rules import GeyeSearchRuleModel, GeyeFilterRuleModel
 from .token import GeyeTokenModel
 from .user import GeyeUserModel
+
+from .yuque import GeyeYuqueSearchRuleModel
