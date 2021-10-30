@@ -10,7 +10,7 @@ WORKDIR /app
 # 复制代码到 docker 中
 ADD . /app/
 
-# 安装 nodejs
+# 安装 nodejs, nginx
 RUN sed -i 's#http://deb.debian.org#https://mirrors.aliyun.com#g' /etc/apt/sources.list && \
     sed -i 's#security.debian.org/debian-security#mirrors.ustc.edu.cn/debian-security#g' /etc/apt/sources.list && \
     # curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \

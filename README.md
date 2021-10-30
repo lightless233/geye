@@ -30,6 +30,12 @@ cd geye
 cp geye/settings/settings_example.py geye/settings/settings_prod.py
 ```
 
+> 在 `docker-compose.yml` 文件中，有一个环境变量 `GEYE_ENV`，默认为 `prod`，表示生产环境。
+> 
+> 如果此值为 prod，则配置文件需要复制为 settings_prod.py
+> 
+> 如果将此值修改为 dev，则配置文件需要复制为 settings_dev.py
+
 其中有几项设置需要进行修改：
 - ALLOWED_HOSTS：
   - 允许访问的域名或IP，填写部署后实际使用的域名或IP，例如 `geye.lightless.me`，`192.168.62.100`;
@@ -70,8 +76,8 @@ $ cd geye
 $ virtualenv -p python3 venv 
 $ source ./venv/bin/activate
 $ pip install -r requirements.txt
-$ pip install "requests[socks]"
-$ pip install "gunicorn[tornado]"
+$ pip install "requests[socks]"   # 可选，如果在抓取数据时不需要使用 socks5 代理，可以不安装。
+$ pip install "gunicorn[tornado]" # 可选，根据 conf/gunicorn_config.py 中的 worker 类型决定。
 ```
 
 ### 部署Web后端
@@ -96,7 +102,13 @@ $ vim /path_to_your_nginx_conf_dir/geye.nginx.conf # 修改 `root /app/geye-fe/d
 $ nginx -t && nginx -s reload
 ```
 
+> 如果您更熟悉 caddy 等其他服务器，请自行配置。
+
 ### 启动引擎
+引擎是监控 GitHub 的核心部分，目前仅支持 --single 模式启动，即`server`和`agent`一同启动，单机模式。
+
+未来会支持单独启动 `--server` 和 `--agent` 模式，方便分布式部署，扩展应用。
+
 ```bash
 (venv) $ python manage.py run --single 
 ```
