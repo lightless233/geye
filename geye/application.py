@@ -14,7 +14,7 @@
 """
 import queue
 import signal
-from typing import Union, Optional, List
+from typing import Optional, List
 
 from django.conf import settings
 
@@ -34,6 +34,11 @@ class GeyeApplication(object):
         MONITOR_ENGINE: MonitorEngine = None
         MONITOR_SAVE_ENGINE: MonitorSaveEngine = None
 
+        # 语雀监控相关的 ENGINE
+        YUQUE_REFRESH_ENGINE = None
+        YUQUE_SEARCH_ENGINE = None
+        YUQUE_SAVE_ENGINE = None
+
     class MessageQueues:
         """存储所有的消息队列"""
         # 存储搜索任务的队列
@@ -51,6 +56,15 @@ class GeyeApplication(object):
 
         # 存储语雀监控任务相关的队列
         YUQUE_TASK_QUEUE: queue.PriorityQueue = None
+        YUQUE_SAVE_QUEUE: queue.PriorityQueue = None
+
+    def __start_yuque_queue(self):
+        """
+        启动语雀监控任务相关的队列
+        :return: None
+        """
+        self.MessageQueues.YUQUE_TASK_QUEUE = queue.PriorityQueue(maxsize=1024)
+        self.MessageQueues.YUQUE_SAVE_QUEUE = queue.PriorityQueue(maxsize=1024)
 
     def __init__(self, run_mode):
         super(GeyeApplication, self).__init__()
@@ -96,6 +110,9 @@ class GeyeApplication(object):
                 self.MessageQueues.MONITOR_TASK_QUEUE = queue.PriorityQueue(maxsize=monitor_queue_size)
             if "monitor_save_queue" in queues:
                 self.MessageQueues.MONITOR_SAVE_QUEUE = queue.PriorityQueue(maxsize=monitor_save_queue_size)
+
+        # 启动语雀相关的队列
+        self.__start_yuque_queue()
 
     def __init_engines(self, engines: Optional[List[str]]):
         """初始化所需的engine"""
