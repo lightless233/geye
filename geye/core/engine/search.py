@@ -97,8 +97,12 @@ class SearchEngine(MultiThreadEngine):
             }
 
     def build_request_data(self, rule_content, page_num) -> dict:
+        # https://docs.github.com/cn/rest/reference/search#search-code--parameters
         return {
-            "q": "{}+fork:false".format(rule_content),
+            # "q": "{}+fork:false".format(rule_content),
+            # github api 似乎移除了 fork:false 的选项
+            # 详见：https://docs.github.com/en/search-github/searching-on-github/searching-in-forks
+            "q": "{}".format(rule_content),
             "sort": "indexed",
             "per_page": self.each_page_item_size,
             "page": page_num if page_num else 1

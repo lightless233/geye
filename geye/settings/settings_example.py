@@ -35,6 +35,12 @@ ALLOWED_CORS = [
     "127.0.0.1",
 ]
 
+# 数据库的相关信息默认会从环境变量中获取
+# 数据库名称：DB_NAME，例如：geye
+# 数据库用户名：DB_USER，例如：root
+# 数据库密码：DB_PASSWORD，例如：123456
+# 数据库主机：DB_HOST，例如 127.0.0.1
+# 数据库端口：DB_PORT，例如 5432
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -69,11 +75,12 @@ REFRESH_INTERVAL = 60
 # 设置在爬取的时候是否使用代理
 # 如果需要代理，就在下面配置，配置多个代理的情况下
 # 每次会随机获取一个代理使用
+# socks5h 表示在socks服务端进行DNS解析，在国内环境部署时强烈推荐使用 socks5h 协议！
 USE_SEARCH_PROXY = False
 SEARCH_PROXIES = [
     {
-        "http": "socks5://user:pass@host:port",
-        "https": "socks5://user:pass@host:port"
+        "http": "socks5h://user:pass@host:port",
+        "https": "socks5h://user:pass@host:port"
     }
 ]
 # 正则引擎的设置，目前支持的为：
