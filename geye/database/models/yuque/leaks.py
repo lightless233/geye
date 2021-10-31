@@ -49,5 +49,12 @@ class GeyeYuqueLeaksModel(models.Model):
     # 1 - 待处理，2 - 确认是泄露，3-误报
     status = models.PositiveSmallIntegerField(default=1)
 
+    # 文章的几个时间值
+    content_updated_at = models.CharField(max_length=32, default="")
+    first_published_at = models.CharField(max_length=32, default="")
+    published_at = models.CharField(max_length=32, default="")
+    paper_created_at = models.CharField(max_length=32, default="")
+    paper_updated_at = models.CharField(max_length=32, default="")
+
     objects = models.Manager()
     instance = GeyeYuqueLeakManager()
