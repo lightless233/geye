@@ -4,4 +4,5 @@ module.exports = {
     // publicPath: "/public",
     // outputDir: path.join(__dirname, "../templates/"),
     lintOnSave: false,
+    productionSourceMap: false,
 };
