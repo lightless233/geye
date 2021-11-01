@@ -17,9 +17,9 @@ RUN sed -i 's#http://deb.debian.org#https://mirrors.aliyun.com#g' /etc/apt/sourc
     curl -sSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
     echo "deb https://mirrors.ustc.edu.cn/nodesource/deb/node_14.x stretch main" >> /etc/apt/sources.list && \
     echo "deb-src https://mirrors.ustc.edu.cn/nodesource/deb/node_14.x stretch main" >> /etc/apt/sources.list && \
-    apt update && \
-    apt install -y apt-utils nodejs nginx && \
-    apt autoremove -y
+    apt-get update && \
+    apt-get install -y apt-utils nodejs nginx && \
+    apt-get autoremove -y
 
 # 构建前端代码
 RUN ls -alh /app/ && \
