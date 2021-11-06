@@ -207,6 +207,7 @@ class YuqueSearchEngine(MultiThreadEngine):
             # "rule_id": row.id,
             # "rule_content": row.rule,
             rule_content = task.get("rule_content")
+            rule_id = task.get("rule_id")
             if not rule_content:
                 continue
 
@@ -236,4 +237,4 @@ class YuqueSearchEngine(MultiThreadEngine):
                 results.extend(parsed_result)
 
             # 放进队列中
-            self._put_task(PriorityTask(priority, results))
+            self._put_task(PriorityTask(priority, {"rule_id": rule_id, "results": results}))

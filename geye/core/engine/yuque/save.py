@@ -15,6 +15,7 @@
 import queue
 
 from geye.core.engine.base import SingleThreadEngine
+from geye.database.models.yuque.leaks import GeyeYuqueLeaksModel
 from geye.utils.log import logger
 
 
@@ -36,8 +37,30 @@ class YuqueSaveEngine(SingleThreadEngine):
 
     def _worker(self):
         logger.debug("{} start.".format(self.name))
-        self._real_worker()
-        logger.debug("{} end.".format(self.name))
+        while self.is_running():
+            _, task = self._get_task()
+            if not task:
+                continue
 
-    def _real_worker(self):
-        pass
+            rule_id = task.get("rule_id")
+            result_list = task.get("results")
+
+            for result in result_list:
+                leak = GeyeYuqueLeaksModel()
+                leak.title = result.get("title")
+                leak.go_url = result.get("url")
+                leak.url = result.get("raw_url")
+                leak.book_name = result.get("book_name")
+                leak.group_name = result.get("group_name")
+                leak.abstract = result.get("abstract")
+                leak.search_rule_obj = result.get("")
+                leak.search_rule_id = rule_id
+                leak.status = 1
+                leak.content_updated_at = task.get("content_updated_at")
+                leak.first_published_at = task.get("first_published_at")
+                leak.paper_created_at = task.get("created_at")
+                leak.paper_updated_at = task.get("updated_at")
+                leak.save()
+                logger.debug("Save yuque leak <<{}>>".format(result.get("title")))
+
+        logger.debug("{} end.".format(self.name))
